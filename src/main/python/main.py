@@ -16,7 +16,7 @@ class AppContext(ApplicationContext):
     def run(self):
         window = WelcomeWindow(ctx=self)
         version = self.build_settings['version'] 
-        window.setWindowTitle("T-Assist v" + version)
+        window.setWindowTitle("BZMAN v" + version)
         # window.resize(250, 150) 
         window.show()
         return self.app.exec_()
@@ -64,7 +64,7 @@ class WelcomeWindow(QMainWindow):
         super().__init__()
         self.ctx = ctx
 
-        self.setWindowTitle("Welcome to T-Assist!")
+        self.setWindowTitle("Welcome to BZMAN!")
 
         # label = QLabel("Welcome to Tuition Manager!\nCreate or Load a File")
         # label.setAlignment(Qt.AlignCenter)
@@ -74,8 +74,8 @@ class WelcomeWindow(QMainWindow):
             "&#8291;" \
             "<img src=%r>" \
             "</center>" \
-            "<p>T-Assist<br/>"\
-            "Version 0.3.0</p>"\
+            "<p>BzMan<br/>"\
+            "Version 0.1.Beta</p>"\
             % self.ctx.get_logo#<br/>" \
             # "Copyright &copy; JSS Inc.</p>"
         label = QLabel(text)
@@ -249,7 +249,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
         self.setGeometry(800, 100, 1200, 1500)
-        self.setWindowTitle('T-Asssist')
+        self.setWindowTitle('BZMAN')
     
     def load(self):
         #data_pkl = pd.ExcelFile(self.database_filename)

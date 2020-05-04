@@ -327,7 +327,7 @@ class EntryPanel(QMainWindow):
         self.setCentralWidget(self.container)
 
         self.setGeometry(1500, 100, 1000,800)
-        self.setWindowTitle('T-Assist Entry Panel')
+        self.setWindowTitle('Entry Panel')
 
         self.check_payment_method()# check correct option selection and enabling of lineedits
         # self.show()
@@ -422,7 +422,7 @@ class EditViewPanel(EntryPanel):
             self.edit_checkbox.setChecked(False)
         self.undo_btn.clicked.connect(self.undo_changes)
         
-        self.setWindowTitle('T-Assist Edit Panel')
+        self.setWindowTitle('View/Edit Panel')
         self.show()
     
     def edit_or_view(self):
