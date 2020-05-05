@@ -1,16 +1,39 @@
 [
     {
-        "Name": "John Appleased",
-        "Std": "10",
-        "School": "Ryan International",
-        "Annual Fees (Rs.)": 10000.0,
-        "Fees Paid (Rs.)": 1000.0,
-        "Fees Remaining (Rs.)": 9000.0,
-        "Phone No.": "XXXXX",
-        "Details": "New student referred by YYYY",
+        "Company Name": "Apple Inc",
+        "Contact Name": "Tim Cook",
+        "Email": "tim.cook@apple.com",
+        "Total Balance": 300000.0,
+        "Paid": 10000.0,
+        "Remaining": 290000.0,
+        "Phone No.": "XXXXX-XXXXX",
+        "Details": "Position - CEO\nMet through apple developer conference",
         "Logs": {
             "Log1": {
-                "Record Date": "May 03, 2020",
+                "Record Date": "May 04, 2020",
+                "Opening Balance": 300000.0,
+                "Closing Balance": 290000.0,
+                "Payment Amount": 10000.0,
+                "Payment Method": "Cheque",
+                "Details": {
+                    "Bank Name": "Bank of America",
+                    "Cheque Number": "XXX1234XXXX"
+                }
+            }
+        }
+    },
+    {
+        "Company Name": "Apple Inc.",
+        "Contact Name": "Steve Jobs",
+        "Email": "steve.jobs@apple.com",
+        "Total Balance": 10000.0,
+        "Paid": 1000.0,
+        "Remaining": 9000.0,
+        "Phone No.": "XXXXX-XXXXX",
+        "Details": "",
+        "Logs": {
+            "Log1": {
+                "Record Date": "May 04, 2020",
                 "Opening Balance": 10000.0,
                 "Closing Balance": 9000.0,
                 "Payment Amount": 1000.0,
@@ -19,25 +42,14 @@
         }
     },
     {
-        "Name": "Ram Patel",
-        "Std": "5",
-        "School": "Shardayatan",
-        "Annual Fees (Rs.)": 5000.0,
-        "Fees Paid (Rs.)": 0.0,
-        "Fees Remaining (Rs.)": 5000.0,
+        "Company Name": "Reliance",
+        "Contact Name": "Mukesh",
+        "Email": "mk@reliance.in",
+        "Total Balance": 200000.0,
+        "Paid": 0.0,
+        "Remaining": 200000.0,
         "Phone No.": "XXXX",
-        "Details": "Old returning student - disocunt fees offered (10%)",
-        "Logs": {}
-    },
-    {
-        "Name": "Shyam Patel",
-        "Std": "8",
-        "School": "Woodbridge",
-        "Annual Fees (Rs.)": 8000.0,
-        "Fees Paid (Rs.)": 0.0,
-        "Fees Remaining (Rs.)": 8000.0,
-        "Phone No.": "XXXXX",
-        "Details": "",
+        "Details": "CEO",
         "Logs": {}
     }
 ]

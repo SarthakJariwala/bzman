@@ -148,9 +148,6 @@ class WelcomeWindow(QMainWindow):
         if filename:
             self.database_filename = filename+".json"
             new_database = list()
-            # new_database = pd.DataFrame(columns=["Name", "Std","School",
-            #     "Annual Fees (Rs.)", "Fees Paid (Rs.)",
-            #     "Fees Remaining (Rs.)", "Phone No."])
             write_file(new_database, self.database_filename)
             # new_database.to_csv(self.database_filename, index=False)
             self.entry_panel = EntryPanel(self.database_filename, self.ctx)
@@ -255,29 +252,27 @@ class MainWindow(QMainWindow):
         #data_pkl = pd.ExcelFile(self.database_filename)
         #data_pkl = data_pkl.parse("Sheet1")
         data_pkl = read_file(self.database_filename)
-        names = []
-        stds = []
-        schools = []
+        company_names = []
+        contact_names = []
         rem_fees = []
         for i in range(len(data_pkl)):
-            names.append(data_pkl[i]["Name"])
-            stds.append(data_pkl[i]["Std"])
-            schools.append(data_pkl[i]["School"])
-            rem_fees.append(data_pkl[i]["Fees Remaining (Rs.)"])
-        return names, stds, schools, rem_fees
+            company_names.append(data_pkl[i]["Company Name"])
+            contact_names.append(data_pkl[i]["Contact Name"])
+            rem_fees.append(data_pkl[i]["Remaining"])
+        return company_names, contact_names, rem_fees
     
     def load_widgets(self):
-        names,stds, schools, rem_fees = self.load()
-        self.widget_names = functools.reduce(operator.iconcat, [names, str(stds), schools, str(rem_fees)], [])
+        company_names,contact_names,rem_fees = self.load()
+        self.widget_names = functools.reduce(operator.iconcat, [company_names, contact_names, str(rem_fees)], [])
         self.widgets = []
-        idx_numbers = list(range(0,len(names)))
+        idx_numbers = list(range(0,len(company_names)))
 
         # Iterate the names, creating a new OnOffWidget for 
         # each one, adding it to the layout and 
         # and storing a reference in the `self.widgets` list
-        for idx_no, name, std, school, rem_fee in list(zip(idx_numbers, names, stds, schools, rem_fees)):
-            item = [idx_no, name, std, school]
-            item = MasterViewerWidget(idx_no, name, std, school, rem_fee, database_filename=self.database_filename, ctx=self.ctx)#in the future, can reduce redundancy by only passing ctx and creating a function in Appctxt that reads database filename
+        for idx_no, company_name, contact_name, rem_fee in list(zip(idx_numbers, company_names, contact_names, rem_fees)):
+            # item = [idx_no, company_name, contact_names]
+            item = MasterViewerWidget(idx_no, company_name, contact_name, rem_fee, database_filename=self.database_filename, ctx=self.ctx)#in the future, can reduce redundancy by only passing ctx and creating a function in Appctxt that reads database filename
             self.controlsLayout.addWidget(item)
             self.widgets.append(item)
         
@@ -295,11 +290,9 @@ class MainWindow(QMainWindow):
     def update_display(self, text):
         try:
             for widget in self.widgets:
-                if text.lower() in widget.name.lower():
+                if text.lower() in widget.company_name.lower():
                     widget.show()
-                elif text.lower() in widget.std.lower():
-                    widget.show()
-                elif text.lower() in widget.school.lower():
+                elif text.lower() in widget.contact_name.lower():
                     widget.show()
                 else:
                     widget.hide()
@@ -342,13 +335,18 @@ def run():
         appctxt = AppContext()       # 1. Instantiate ApplicationContext
         # app = QApplication(sys.argv)
         # change font style globally
-        font = QFont("Calibri") # "Avenir" "Helvetica" "Proxima Nova" "Playfair Display" "Roboto" "Open Sans" "Montserrat" "SansSerif"
+        try:
+            font = QFont("Verdana") # "Avenir" "Helvetica" "Proxima Nova" "Playfair Display" "Roboto" "Open Sans" "Montserrat" "SansSerif"
         # font.setStyleHint(QFont.Calibri)
+        except:
+            font = QFont("Open Sans")
+        else:
+            font = QFont("Arial")
         appctxt.app.setFont(font)
         appctxt.app.setStyle("Fusion")
-        appctxt.app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
-        # appctxt.app.setPalette(appctxt.dark_palette())
-        # appctxt.app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
+        # appctxt.app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
+        appctxt.app.setPalette(appctxt.dark_palette())
+        appctxt.app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
         # w = WelcomeWindow()
         # w.show()
         print(time()-start_time)

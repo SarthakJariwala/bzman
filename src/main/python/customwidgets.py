@@ -9,34 +9,29 @@ from datetime import date
 
 class MasterViewerWidget(QWidget):
 
-    def __init__(self, idx_no, name, std, school, rem_fees, database_filename, ctx):
+    def __init__(self, idx_no, company_name, contact_name, rem_fees, database_filename, ctx):
         super(MasterViewerWidget, self).__init__()
         self.ctx = ctx
 
-        self.name = name
+        self.company_name = company_name
         self.idx_no = str(idx_no)
         self.database_filename = database_filename
-        self.std = str(std)
-        self.school = school
+        self.contact_name = contact_name
         self.rem_fees = rem_fees # will convert to string later 
 
         self.idx_lbl = QLabel(self.idx_no)
         
-        self.name_lbl = QLabel("Name: "+self.name)
+        self.name_lbl = QLabel("Company: "+self.company_name)
         # lbl_font = self.name_lbl.font()
         # lbl_font.setPointSize(14)
         # self.name_lbl.setFont(lbl_font)
 
-        self.std_lbl = QLabel("Standard: "+self.std)
+        self.contact_lbl = QLabel("Contact: "+self.contact_name)
         #lbl_font = self.std_lbl.font()
         #lbl_font.setPointSize(10)
         #self.std_lbl.setFont(lbl_font)
 
-        self.school_lbl = QLabel("School: "+self.school)
-        #lbl_font = self.school_lbl.font()
-        #lbl_font.setPointSize(10)
-        #self.school_lbl.setFont(lbl_font)
-        self.rem_fees_lbl = QLabel("Fees Remaining (Rs.): \n"+str(self.rem_fees))
+        self.rem_fees_lbl = QLabel("Pending Payment: \n"+str(self.rem_fees))
         if self.rem_fees == 0:
             self.rem_fees_lbl.setStyleSheet("QLabel {color: #4ecca3;} ")
         else:
@@ -46,14 +41,13 @@ class MasterViewerWidget(QWidget):
         self.btn_edit = QPushButton("Edit")
         self.btn_edit.setStyleSheet("QPushButton {background-color: #4ecca3; color:black;}")#font-size:25px;}")
         self.btn_delete = QPushButton("Delete")
-        self.btn_delete.setStyleSheet("QPushButton {background-color: #ff4866; color: black;}")#font-size:25px;}")
+        self.btn_delete.setStyleSheet("QPushButton {background-color: #ff4866; color: white;}")#font-size:25px;}")
         self.btn_delete.setVisible(False)
 
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.idx_lbl)
         self.vbox1.addWidget(self.name_lbl)
-        self.vbox1.addWidget(self.std_lbl)
-        self.vbox1.addWidget(self.school_lbl)
+        self.vbox1.addWidget(self.contact_lbl)
         self.vbox1.addWidget(self.rem_fees_lbl)
         self.hbox2 = QHBoxLayout()
         self.hbox2.addWidget(self.btn_view)
@@ -99,7 +93,7 @@ class MasterViewerWidget(QWidget):
         """
         Show this widget, and all child widgets.
         """
-        for w in [self, self.name_lbl, self.std_lbl, self.school_lbl, self.rem_fees_lbl, self.btn_view, self.btn_edit]:
+        for w in [self, self.name_lbl, self.contact_lbl, self.rem_fees_lbl, self.btn_view, self.btn_edit]:
             w.setVisible(True)
         try:
             self.btn_delete.setVisible(True)
@@ -110,7 +104,7 @@ class MasterViewerWidget(QWidget):
         """
         Hide this widget, and all child widgets.
         """
-        for w in [self, self.name_lbl, self.std_lbl, self.school_lbl,self.rem_fees_lbl, self.btn_view, self.btn_edit]:
+        for w in [self, self.name_lbl, self.contact_lbl, self.rem_fees_lbl, self.btn_view, self.btn_edit]:
             w.setVisible(False)
         try:
             self.btn_delete.setVisible(False)
@@ -127,7 +121,7 @@ class EntryWidget(QWidget):
         self.lbl = QLabel(self.name)
         self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.ledit = QLineEdit()
-        self.ledit.setStyleSheet("QLineEdit {font-weight: bold;}")
+        # self.ledit.setStyleSheet("QLineEdit {font-weight: bold;}")
 
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.lbl)
@@ -144,7 +138,7 @@ class EntryTextEditWidget(QWidget):
         self.lbl = QLabel(self.name)
         self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.tedit = QTextEdit()
-        self.tedit.setStyleSheet("QTextEdit {font-weight: bold;}")
+        # self.tedit.setStyleSheet("QTextEdit {font-weight: bold;}")
 
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.lbl)
@@ -161,8 +155,8 @@ class EntrySpinBoxWidget(QWidget):
         self.lbl = QLabel(self.name)
         self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.spin_box = QDoubleSpinBox()
-        self.spin_box.setStyleSheet("QDoubleSpinBox {font-weight: bold}")
-        self.spin_box.setMaximum(1000000000.00)
+        self.spin_box.setStyleSheet("QDoubleSpinBox {font-weight: bold;}")
+        self.spin_box.setMaximum(1000000000000000.00)
         self.spin_box.setMinimum(0.00)
 
         self.vbox1 = QVBoxLayout()
@@ -181,9 +175,9 @@ class EntryPanel(QMainWindow):
         self.panelsLayout = QGridLayout() 
 
         self.panel_entry_names = [
-            "NAME", "STANDARD","SCHOOL",
-            "ANNUAL FEES (Rs.)", "FEES PAID (Rs.)",
-            "FEES REMAINING (Rs.)", "PHONE NO.",
+            "COMPANY", "CONTACT","E-MAIL",
+            "TOTAL BALANCE", "PAID",
+            "REMAINING", "PHONE NO.",
             "BANK", "CHEQUE NO.", "NEW PAYMENT",
             "DETAILS" 
         ]
@@ -206,32 +200,34 @@ class EntryPanel(QMainWindow):
         tabs.addTab(self.tab2, "PAYMENT")
         tabs.addTab(self.tab3, "LOG")
         
-        # Tab1
-        item = EntryWidget(self.panel_entry_names[0])#Name
+        # Tab1 # TODO: add QCompleter to the text entries
+        item = EntryWidget(self.panel_entry_names[0])#Company Name
         self.tab1Layout.addWidget(item,0,0,1,2)
         self.panel_entry.append(item)
-        item = EntryWidget(self.panel_entry_names[1])#Standard
+        item = EntryWidget(self.panel_entry_names[1])#Contact Name
         self.tab1Layout.addWidget(item,1,0)
         self.panel_entry.append(item)
-        item = EntryWidget(self.panel_entry_names[2])#School
+        item = EntryWidget(self.panel_entry_names[2])#Email
+        item.ledit.setPlaceholderText("name@company.com")
         self.tab1Layout.addWidget(item,1,1)
         self.panel_entry.append(item)
         
         # Tab2
-        item = EntrySpinBoxWidget(self.panel_entry_names[3])#"Annual Fees (Rs.)"
+        item = EntrySpinBoxWidget(self.panel_entry_names[3])#"Total Balance"
         self.tab2Layout.addWidget(item,0,0)
         self.panel_entry.append(item)
-        item = EntrySpinBoxWidget(self.panel_entry_names[4])#"Fees Paid (Rs.)"
+        item = EntrySpinBoxWidget(self.panel_entry_names[4])#"Paid"
         item.lbl.setStyleSheet("QLabel {font-weight: bold; color: #4ecca3;}")
         self.tab2Layout.addWidget(item,0,1)
         self.panel_entry.append(item)
-        item = EntrySpinBoxWidget(self.panel_entry_names[5])#"Fees Remaining (Rs.)"
+        item = EntrySpinBoxWidget(self.panel_entry_names[5])#"Remaining"
         item.lbl.setStyleSheet("QLabel {font-weight: bold; color: #ff4866;}")
         self.tab2Layout.addWidget(item,1,0)
         self.panel_entry.append(item)
 
         # From tab1 but kept order the same as previous version to avoid changing list indexing in "panel_entry_names" in the class
         item = EntryWidget(self.panel_entry_names[6]) # Phone No
+        item.ledit.setPlaceholderText("+Y-XXXXX-XXXXX")
         self.tab1Layout.addWidget(item,2,0,1,1)
         self.panel_entry.append(item)
 
@@ -271,13 +267,14 @@ class EntryPanel(QMainWindow):
 
         # From tab1 but kept order the same as previous version to avoid changing list indexing in "panel_entry_names" in the class
         item = EntryTextEditWidget(self.panel_entry_names[10]) # Details
+        item.tedit.setPlaceholderText("Add additional details here")
         self.tab1Layout.addWidget(item,3,0,2,2)
         self.panel_entry.append(item)
 
         # Tab3
         self.log_textEdit = QTextEdit()
         self.log_textEdit.setReadOnly(True)
-        self.log_textEdit.setStyleSheet("QTextEdit {font-weight: bold;}")
+        # self.log_textEdit.setStyleSheet("QTextEdit {font-weight: bold;}")
         self.tab3Layout.addWidget(self.log_textEdit)
 
         #Set Layout for tabs
@@ -327,7 +324,7 @@ class EntryPanel(QMainWindow):
         self.setCentralWidget(self.container)
 
         self.setGeometry(1500, 100, 1000,800)
-        self.setWindowTitle('Entry Panel')
+        self.setWindowTitle('Add New Entry')
 
         self.check_payment_method()# check correct option selection and enabling of lineedits
         # self.show()
@@ -368,9 +365,9 @@ class EntryPanel(QMainWindow):
             self.statusBar.showMessage("Error: Make sure the numbers are positive!", 2000)
     
     def collect_widget_data(self):# TODO collect Log entries while editing and reading file
-       name = self.panel_entry[0].ledit.text()
-       std =  self.panel_entry[1].ledit.text()
-       school =  self.panel_entry[2].ledit.text()
+       company_name = self.panel_entry[0].ledit.text()
+       contact_name =  self.panel_entry[1].ledit.text()
+       email =  self.panel_entry[2].ledit.text()
        fees_ann = float(self.panel_entry[3].spin_box.value())
        fees_paid = float(self.panel_entry[4].spin_box.value())
        fees_rem = float(self.panel_entry[5].spin_box.value())
@@ -379,9 +376,9 @@ class EntryPanel(QMainWindow):
        # Read in database file to write in
        data_pkl = read_file(self.database_filename)
        data_dict={
-           "Name": name, "Std": std, "School": school,
-           "Annual Fees (Rs.)": fees_ann, "Fees Paid (Rs.)": fees_paid, 
-           "Fees Remaining (Rs.)": fees_rem, "Phone No.": phone_no,
+           "Company Name": company_name, "Contact Name": contact_name, "Email": email,
+           "Total Balance": fees_ann, "Paid": fees_paid, 
+           "Remaining": fees_rem, "Phone No.": phone_no,
            "Details": details,
            "Logs":{}
            }
@@ -455,22 +452,22 @@ class EditViewPanel(EntryPanel):
     
     def get_data(self):
         data_pkl = read_file(self.database_filename)
-        name = data_pkl[int(self.idx_no)]["Name"]#.iloc[int(self.idx_no)]
-        std = data_pkl[int(self.idx_no)]["Std"]
-        school = data_pkl[int(self.idx_no)]["School"]
-        fees_ann = data_pkl[int(self.idx_no)]["Annual Fees (Rs.)"]
-        fees_paid = data_pkl[int(self.idx_no)]["Fees Paid (Rs.)"]
-        fees_rem = data_pkl[int(self.idx_no)]["Fees Remaining (Rs.)"]
+        company_name = data_pkl[int(self.idx_no)]["Company Name"]#.iloc[int(self.idx_no)]
+        contact_name = data_pkl[int(self.idx_no)]["Contact Name"]
+        email = data_pkl[int(self.idx_no)]["Email"]
+        fees_ann = data_pkl[int(self.idx_no)]["Total Balance"]
+        fees_paid = data_pkl[int(self.idx_no)]["Paid"]
+        fees_rem = data_pkl[int(self.idx_no)]["Remaining"]
         phone_no = data_pkl[int(self.idx_no)]["Phone No."]
         details = data_pkl[int(self.idx_no)]["Details"]
         self.prev_log = data_pkl[int(self.idx_no)]["Logs"]
-        return name, std, school, fees_ann, fees_paid, fees_rem, phone_no, details
+        return company_name, contact_name, email, fees_ann, fees_paid, fees_rem, phone_no, details
     
     def populate_view(self, data):
-        name, std, school, fees_ann, fees_paid, fees_rem, phone_no, details = data
-        self.panel_entry[0].ledit.setText(str(name))
-        self.panel_entry[1].ledit.setText(str(std))
-        self.panel_entry[2].ledit.setText(str(school))
+        company_name, contact_name, email, fees_ann, fees_paid, fees_rem, phone_no, details = data
+        self.panel_entry[0].ledit.setText(str(company_name))
+        self.panel_entry[1].ledit.setText(str(contact_name))
+        self.panel_entry[2].ledit.setText(str(email))
         self.panel_entry[3].spin_box.setValue(float(fees_ann))
         self.panel_entry[4].spin_box.setValue(float(fees_paid))
         self.panel_entry[5].spin_box.setValue(float(fees_rem))
@@ -537,9 +534,9 @@ class EditViewPanel(EntryPanel):
                     self.log_str += indent + ">"+ """<b> {}</b><br/>""".format(print_string)
 
     def collect_widget_data(self):
-       name = self.panel_entry[0].ledit.text()
-       std =  self.panel_entry[1].ledit.text()
-       school =  self.panel_entry[2].ledit.text()
+       company_name = self.panel_entry[0].ledit.text()
+       contact_name =  self.panel_entry[1].ledit.text()
+       email =  self.panel_entry[2].ledit.text()
        fees_ann = float(self.panel_entry[3].spin_box.value())
        fees_paid = float(self.panel_entry[4].spin_box.value())
        fees_rem = float(self.panel_entry[5].spin_box.value())
@@ -548,13 +545,13 @@ class EditViewPanel(EntryPanel):
        details = self.panel_entry[10].tedit.toPlainText()
 
        data_pkl = read_file(self.database_filename)
-       prev_balance = data_pkl[int(self.idx_no)]["Fees Remaining (Rs.)"]
-       data_pkl[int(self.idx_no)]["Name"] = name
-       data_pkl[int(self.idx_no)]["Std"] = std
-       data_pkl[int(self.idx_no)]["School"] = school
-       data_pkl[int(self.idx_no)]["Annual Fees (Rs.)"] = fees_ann
-       data_pkl[int(self.idx_no)]["Fees Paid (Rs.)"] = fees_paid
-       data_pkl[int(self.idx_no)]["Fees Remaining (Rs.)"] =  fees_rem
+       prev_balance = data_pkl[int(self.idx_no)]["Remaining"]
+       data_pkl[int(self.idx_no)]["Company Name"] = company_name
+       data_pkl[int(self.idx_no)]["Contact Name"] = contact_name
+       data_pkl[int(self.idx_no)]["Email"] = email
+       data_pkl[int(self.idx_no)]["Total Balance"] = fees_ann
+       data_pkl[int(self.idx_no)]["Paid"] = fees_paid
+       data_pkl[int(self.idx_no)]["Remaining"] =  fees_rem
        data_pkl[int(self.idx_no)]["Phone No."] =  phone_no
        data_pkl[int(self.idx_no)]["Details"] =  details
        
