@@ -323,7 +323,7 @@ class EntryPanel(QMainWindow):
 
         self.setCentralWidget(self.container)
 
-        self.setGeometry(1500, 100, 1000,800)
+        self.setGeometry(1500, 100, 1000*self.devicePixelRatio(),800*self.devicePixelRatio())
         self.setWindowTitle('Add New Entry')
 
         self.check_payment_method()# check correct option selection and enabling of lineedits

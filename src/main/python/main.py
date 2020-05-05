@@ -4,8 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from customwidgets import MasterViewerWidget, EntryPanel
-# import qtmodern.styles
-# import qtmodern.windows
+from tutorial import Tutorial
 import qdarkstyle
 from util import read_file, write_file
 import breeze_resources
@@ -116,6 +115,10 @@ class WelcomeWindow(QMainWindow):
         font = QAction("Fonts", self)
         font.triggered.connect(self.font_choice)
 
+        tu_add_new_entry_acc = QAction("Create or Add New", self)
+        tu_add_new_entry_acc.triggered.connect(self.tu_add_new_entry)
+        tu_edit_entry_acc = QAction("Edit Entry", self)
+
         self.setStatusBar(QStatusBar(self))
 
         menu = self.menuBar()
@@ -125,6 +128,10 @@ class WelcomeWindow(QMainWindow):
         file_menu.addAction(load_action)
         file_menu.addAction(load_demo)
 
+        tutorial = menu.addMenu("Tutorial")
+        tutorial.addAction(tu_add_new_entry_acc)
+        tutorial.addAction(tu_edit_entry_acc)
+
         options = menu.addMenu("&Customize")
         theme = options.addMenu("Theme")
         theme.addAction(dark_theme)
@@ -133,7 +140,7 @@ class WelcomeWindow(QMainWindow):
         theme.addAction(blue)
         options.addAction(font)
 
-        self.setGeometry(800,100,1000,1000)
+        self.setGeometry(800,100,1000*self.devicePixelRatio(),1000*self.devicePixelRatio())
     
     def load_file(self):
         filename = QFileDialog.getOpenFileName(self, "Open", filter="Database Files (*.json)")[0]
@@ -181,6 +188,15 @@ class WelcomeWindow(QMainWindow):
         font, valid = QFontDialog.getFont()
         if valid:
             self.ctx.app.setFont(font)
+    
+    def tu_add_new_entry(self):
+        self.tu = Tutorial()
+        ans = self.tu.start_tutorial(parent = self)
+
+        if ans == QMessageBox.Ok:
+            print("yes begin tutorial")
+            self.new_file()
+            self.tu.new_entry(parent=self)
 
 
 class MainWindow(QMainWindow):
@@ -245,7 +261,7 @@ class MainWindow(QMainWindow):
         container.setLayout(containerLayout)
         self.setCentralWidget(container)
 
-        self.setGeometry(800, 100, 1200, 1500)
+        self.setGeometry(800, 100, 1200*self.devicePixelRatio(), 1500*self.devicePixelRatio())
         self.setWindowTitle('BZMAN')
     
     def load(self):
