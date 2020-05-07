@@ -46,10 +46,69 @@
         "Contact Name": "Mukesh",
         "Email": "mk@reliance.in",
         "Total Balance": 200000.0,
-        "Paid": 0.0,
-        "Remaining": 200000.0,
+        "Paid": 55000.0,
+        "Remaining": 145000.0,
         "Phone No.": "XXXX",
         "Details": "CEO",
+        "Logs": {
+            "Log1": {
+                "Record Date": "May 05, 2020",
+                "Opening Balance": 200000.0,
+                "Closing Balance": 180000.0,
+                "Payment Amount": 20000.0,
+                "Payment Method": "Cheque",
+                "Details": {
+                    "Bank Name": "ICICI",
+                    "Cheque Number": "XXXXX"
+                }
+            },
+            "Log2": {
+                "Record Date": "May 05, 2020",
+                "Opening Balance": 180000.0,
+                "Closing Balance": 150000.0,
+                "Payment Amount": 30000.0,
+                "Payment Method": "Cash"
+            },
+            "Log3": {
+                "Record Date": "May 05, 2020",
+                "Opening Balance": 150000.0,
+                "Closing Balance": 147000.0,
+                "Payment Amount": 3000.0,
+                "Payment Method": "Cheque",
+                "Details": {
+                    "Bank Name": "YES Bank",
+                    "Cheque Number": "XXXX7878XXX"
+                }
+            },
+            "Log4": {
+                "Record Date": "May 05, 2020",
+                "Opening Balance": 147000.0,
+                "Closing Balance": 145000.0,
+                "Payment Amount": 2000.0,
+                "Payment Method": "Cash"
+            }
+        }
+    },
+    {
+        "Company Name": "Awesome Packaging LLC",
+        "Contact Name": "Anirudh Chandak",
+        "Email": "ani@gmail.com",
+        "Total Balance": 30000.0,
+        "Paid": 0.0,
+        "Remaining": 30000.0,
+        "Phone No.": "91-123456789",
+        "Details": "Marketing lead - met at Bandra expo",
+        "Logs": {}
+    },
+    {
+        "Company Name": "Best Zippers LLC",
+        "Contact Name": "Roneet Choudhary",
+        "Email": "ronny@yahoo.com",
+        "Total Balance": 30000.0,
+        "Paid": 0.0,
+        "Remaining": 30000.0,
+        "Phone No.": "91-8989898898",
+        "Details": "Owner\nMet at Pune expo",
         "Logs": {}
     }
 ]

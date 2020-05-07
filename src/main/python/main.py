@@ -3,7 +3,8 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from customwidgets import MasterViewerWidget, EntryPanel
+from customwidgets import MasterViewerWidget 
+from panels import EntryPanel
 from tutorial import Tutorial
 import qdarkstyle
 from util import read_file, write_file
@@ -23,6 +24,10 @@ class AppContext(ApplicationContext):
     @cached_property
     def get_logo(self):
         return self.get_resource('logo.png')
+    
+    @cached_property
+    def get_plus_sign(self):
+        return self.get_resource("plus-button.png")
     
     @cached_property
     def get_demo_data(self):
@@ -73,7 +78,7 @@ class WelcomeWindow(QMainWindow):
             "&#8291;" \
             "<img src=%r>" \
             "</center>" \
-            "<p>BzMan<br/>"\
+            "<p>BZMAN<br/>"\
             "Version 0.1.Beta</p>"\
             % self.ctx.get_logo#<br/>" \
             # "Copyright &copy; JSS Inc.</p>"
@@ -115,6 +120,7 @@ class WelcomeWindow(QMainWindow):
         font = QAction("Fonts", self)
         font.triggered.connect(self.font_choice)
 
+        # Tutorial actions
         tu_add_new_entry_acc = QAction("Create or Add New", self)
         tu_add_new_entry_acc.triggered.connect(self.tu_add_new_entry)
         tu_edit_entry_acc = QAction("Edit Entry", self)
@@ -233,7 +239,7 @@ class MainWindow(QMainWindow):
         self.reload_btn.clicked.connect(self.reload_func)
 
         # Adding "Add" Button
-        self.add_new_btn = QPushButton("Add New Entry")
+        self.add_new_btn = QPushButton("Create New")
         self.add_new_btn.setStyleSheet("QPushButton {background-color: #927fbf;color:black}")#7045af
         self.add_new_btn.clicked.connect(self.add_new_entry)
 
@@ -261,7 +267,7 @@ class MainWindow(QMainWindow):
         container.setLayout(containerLayout)
         self.setCentralWidget(container)
 
-        self.setGeometry(800, 100, 1200*self.devicePixelRatio(), 1500*self.devicePixelRatio())
+        self.setGeometry(800, 100, 1500*self.devicePixelRatio(), 1500*self.devicePixelRatio())
         self.setWindowTitle('BZMAN')
     
     def load(self):

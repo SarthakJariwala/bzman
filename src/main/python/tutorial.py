@@ -2,8 +2,6 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from util import read_file, write_file
-from customwidgets import EntryPanel
 
 def inform_user(parent, text):
     ans = QMessageBox.information(
