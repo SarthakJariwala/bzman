@@ -18,7 +18,7 @@ class EntryWidget(QWidget):
         self.name = name
 
         self.lbl = QLabel(self.name)
-        self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
+        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.ledit = QLineEdit()
         # self.ledit.setStyleSheet("QLineEdit {font-weight: bold;}")
 
@@ -35,7 +35,7 @@ class EntryComboBox(QWidget):
         self.name = name
 
         self.lbl = QLabel(self.name)
-        self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
+        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.comboBox = QComboBox()
         # self.ledit.setStyleSheet("QLineEdit {font-weight: bold;}")
 
@@ -52,7 +52,7 @@ class EntryTextEditWidget(QWidget):
         self.name = name
 
         self.lbl = QLabel(self.name)
-        self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
+        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.tedit = QTextEdit()
         # self.tedit.setStyleSheet("QTextEdit {font-weight: bold;}")
 
@@ -69,7 +69,7 @@ class EntrySpinBoxWidget(QWidget):
         self.name = name
 
         self.lbl = QLabel(self.name)
-        self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
+        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.spin_box = QDoubleSpinBox()
         self.spin_box.setStyleSheet("QDoubleSpinBox {font-weight: bold;}")
         self.spin_box.setMaximum(1000000000000000.00)
@@ -86,13 +86,55 @@ class EntryCalendarWidget(QWidget):
         
         self.name = name
         self.lbl = QLabel(self.name)
-        self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
+        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.calendar = QCalendarWidget()
         # self.spin_box.setStyleSheet("QCalendarWidget {font-weight: bold;}")
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.lbl)
         self.vbox1.addWidget(self.calendar)
         self.setLayout(self.vbox1)
+
+
+class PaymentWidget(QWidget):
+    def __init__(self):
+        super(PaymentWidget, self).__init__()
+        # self.payment_widget = QWidget()
+        self.payment_layout = QGridLayout()
+        self.payment_label = QLabel("Payment Method")
+        # payment_label.setStyleSheet("QLabel {font-weight: bold;}")
+        self.payment_layout.addWidget(self.payment_label,0,0,1,2)
+        self.payment_radio_setup = QWidget() # Cash/cheque widget
+        payment_method_layout = QHBoxLayout()
+        self.radio_button1 = QRadioButton("Cash")
+        # self.radio_button1.setStyleSheet("QRadioButton {font-weight: bold;}")
+        self.radio_button1.setChecked(True)
+        self.radio_button1.toggled.connect(self.check_payment_method)
+        payment_method_layout.addWidget(self.radio_button1)
+        self.radio_button2 = QRadioButton("Cheque")
+        # self.radio_button2.setStyleSheet("QRadioButton {font-weight: bold;}")
+        self.radio_button2.toggled.connect(self.check_payment_method)
+        payment_method_layout.addWidget(self.radio_button2)
+        self.payment_radio_setup.setLayout(payment_method_layout)
+        self.payment_layout.addWidget(self.payment_radio_setup,1,0,1,2)
+
+        self.bank_name = EntryWidget("Bank Name")# bank name
+        self.payment_layout.addWidget(self.bank_name,2,0)
+        self.cheque_no = EntryWidget("Cheque Number")# cheque no
+        self.payment_layout.addWidget(self.cheque_no,2,1)
+
+        self.remarks = EntryTextEditWidget("Remarks") #remarks
+        self.payment_layout.addWidget(self.remarks, 3,0,4,2)
+
+        self.setLayout(self.payment_layout)
+        self.check_payment_method()
+    
+    def check_payment_method(self):
+        if self.radio_button2.isChecked():#Cheque radio button
+            self.bank_name.ledit.setEnabled(True)
+            self.cheque_no.ledit.setEnabled(True)
+        else:
+            self.bank_name.ledit.setEnabled(False)
+            self.cheque_no.ledit.setEnabled(False)
 
 class InvoiceDialog(QDialog):
 
@@ -117,18 +159,34 @@ class InvoiceDialog(QDialog):
         self.inp_widgetsLayout.addWidget(self.item_4)
         self.inp_widgets.setLayout(self.inp_widgetsLayout)
 
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(self.inp_widgets)
-        self.layout.addWidget(self.buttonBox)
+        self.payment_entry_widget = PaymentWidget()
+        for w in [
+            self.payment_entry_widget.payment_label,
+            self.payment_entry_widget.radio_button1,
+            self.payment_entry_widget.radio_button2,
+            self.payment_entry_widget.bank_name,
+            self.payment_entry_widget.cheque_no,
+            self.payment_entry_widget.remarks]:
+            w.setVisible(False)
+
+        self.layout = QGridLayout()
+        self.layout.addWidget(self.inp_widgets, 0,0,4,1)
+        self.layout.addWidget(self.payment_entry_widget, 0,1,1,1)
+        self.layout.addWidget(self.buttonBox, 5,1)
         self.setLayout(self.layout)
 
 class PaymentDialog(InvoiceDialog):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # TODO fix this to make sure combobox replaces line edit invoice
-        self.item_1 = EntryComboBox("Invoice Number:")
-        self.inp_widgetsLayout.addWidget(self.item_1)
+        for w in [
+            self.payment_entry_widget.payment_label,
+            self.payment_entry_widget.radio_button1,
+            self.payment_entry_widget.radio_button2,
+            self.payment_entry_widget.bank_name,
+            self.payment_entry_widget.cheque_no,
+            self.payment_entry_widget.remarks]:
+            w.setVisible(True)
 
 class EntryPanel(QMainWindow):
 
@@ -150,10 +208,6 @@ class EntryPanel(QMainWindow):
 
         self.panel_entry = []
 
-        # for panel_name in self.panel_entry_names:
-        #     self.item = EntryWidget(panel_name)
-        #     self.panelsLayout.addWidget(self.item)
-        #     self.panel_entry.append(self.item) ### Change to gridlayout
         tabs = QTabWidget()
         tabs.setStyleSheet('QTabBar::tab {height: 100px; width: 300px; font-weight:bold;}')
         self.tab1 = QWidget()
@@ -259,7 +313,7 @@ class EntryPanel(QMainWindow):
         self.save_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black;}")# #4ecca3
         self.save_btn.clicked.connect(self.update_database)
         
-        # Adding Unfo Button
+        # Adding Undo Button
         self.undo_btn = QPushButton("Undo Changes")
         self.undo_btn.setStatusTip("Can only undo/revert changes if they are not saved!")
         self.undo_btn.setStyleSheet("QPushButton {background-color: #acdbdf; color: black;}")
@@ -275,14 +329,31 @@ class EntryPanel(QMainWindow):
         self.edit_checkbox = QCheckBox("Edit Entry")
         self.edit_checkbox.setStyleSheet("QCheckBox {font-weight:bold;}")
         self.edit_checkbox.setVisible(False)
-        
+        # Add new invoice
+        self.new_invoice_btn = QPushButton("New Invoice")
+        self.new_invoice_btn.setStyleSheet("QPushButton {background-color: #927fbf; color: black;}")
+        self.new_invoice_btn.setVisible(False)
+        self.new_invoice_btn.clicked.connect(self.open_invoice_dialog)
+        # Add new payment
+        self.new_payment_btn = QPushButton("New Payment")
+        self.new_payment_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black;}")
+        self.new_payment_btn.setVisible(False)
+        self.new_payment_btn.clicked.connect(self.open_payment_dialog)
+
+        edit_widget = QWidget()
+        edit_layout = QHBoxLayout()
+        edit_layout.addWidget(self.edit_checkbox)
+        edit_layout.addWidget(self.new_invoice_btn)
+        edit_layout.addWidget(self.new_payment_btn)
+        edit_widget.setLayout(edit_layout)
+
         # Add status bar
         self.statusBar = QStatusBar(self)
         self.setStatusBar(self.statusBar)
 
         self.container = QWidget()
         self.containerLayout = QVBoxLayout()
-        self.containerLayout.addWidget(self.edit_checkbox)
+        self.containerLayout.addWidget(edit_widget)
         self.containerLayout.addWidget(tabs)
         self.containerLayout.addWidget(btn_widgets)
         self.container.setLayout(self.containerLayout)
@@ -329,6 +400,29 @@ class EntryPanel(QMainWindow):
             self.panel_entry[4].spin_box.setValue(new_paid)
         else:
             self.statusBar.showMessage("Error: Make sure the numbers are positive!", 2000)
+
+    def open_invoice_dialog(self):
+        new_invoice_dialog = InvoiceDialog(self)
+        new_invoice_dialog.setWindowTitle('New invoice for '+ str(self.panel_entry[0].ledit.text()))
+        ok = new_invoice_dialog.exec_()
+        
+        if ok and new_invoice_dialog.item_1.ledit.text() and new_invoice_dialog.item_3.spin_box.value() != 0:
+            # TODO add to database
+            print(str(new_invoice_dialog.item_1.ledit.text()))
+            print(str(new_invoice_dialog.item_2.ledit.text()))
+            print(str(new_invoice_dialog.item_3.spin_box.value()))
+            print(str(new_invoice_dialog.item_4.calendar.selectedDate().toString()))
+        elif ok and not new_invoice_dialog.item_1.ledit.text() and new_invoice_dialog.item_3.spin_box.value() == 0:
+            ask_user_to_reload(self, "No entry created - Invoice was left empty or Amount was 0")
+    
+    def open_payment_dialog(self):
+        print("new payment")
+        new_payment_dialog = PaymentDialog(self)
+        new_payment_dialog.setWindowTitle("New Payment for "+ str(self.panel_entry[0].ledit.text()))
+        ok = new_payment_dialog.exec_()
+        # TODO write if else statements
+        if ok:
+            print("true")
     
     def collect_widget_data(self):# TODO collect Log entries while editing and reading file
        company_name = self.panel_entry[0].ledit.text()
@@ -342,14 +436,15 @@ class EntryPanel(QMainWindow):
        # Read in database file to write in
        data_pkl = read_file(self.database_filename)
        data_dict={
-           "Company Name": company_name, "Contact Name": contact_name, "Email": email,
-           "Total Balance": fees_ann, "Paid": fees_paid, 
-           "Remaining": fees_rem, "Phone No.": phone_no,
-           "Details": details,
-           "Logs":{}
+           "Company Name": company_name, "Contact Name": contact_name, 
+           "Email": email, "Phone No.": phone_no, "Fax No.": fax_no,
+           "Total Business": fees_ann, "Total Paid": fees_paid, 
+           "Outstanding": fees_rem,"Details": details,
+           "Invoices":{},
+           "Logs":{},
+           "Price Quote Log":{}
            }
        data_pkl.append(data_dict)
-       #print(data_pkl.to_dict()) #Debug line
        return data_pkl
 
     def update_database(self): #TODO: Catch user entering empty strings
@@ -390,6 +485,8 @@ class EditViewPanel(EntryPanel):
     
     def edit_or_view(self):
         if self.edit_checkbox.isChecked():
+            self.new_invoice_btn.setVisible(True)
+            self.new_payment_btn.setVisible(True)
             self.save_btn.setVisible(True)
             self.undo_btn.setVisible(True)
             self.payment_radio_setup.setEnabled(True)
@@ -403,6 +500,8 @@ class EditViewPanel(EntryPanel):
                 except:
                     self.panel_entry[i].spin_box.setReadOnly(False)
         else:
+            self.new_invoice_btn.setVisible(False)
+            self.new_payment_btn.setVisible(False)
             self.save_btn.setVisible(False)
             self.undo_btn.setVisible(False)
             self.payment_radio_setup.setEnabled(False)
