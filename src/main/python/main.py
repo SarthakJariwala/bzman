@@ -80,7 +80,7 @@ class WelcomeWindow(QMainWindow):
             "<img src=%r>" \
             "</center>" \
             "<p>BZMAN<br/>"\
-            "Version 0.1.Beta</p>"\
+            "Version 0.2.Beta</p>"\
             % self.ctx.get_logo#<br/>" \
             # "Copyright &copy; JSS Inc.</p>"
         label = QLabel(text)
