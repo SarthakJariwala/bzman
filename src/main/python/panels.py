@@ -2,13 +2,13 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import json
-from util import read_file, write_file
+from util import read_file, write_file, write_invoice_to_file, write_new_payment, inform_user
 
-def ask_user_to_reload(parent, text):
-    QMessageBox.information(
-        parent, None, text,
-        QMessageBox.Ok
-    )
+# def inform_user(parent, text):
+#     QMessageBox.information(
+#         parent, None, text,
+#         QMessageBox.Ok
+#     )
 
 class EntryWidget(QWidget):
 
@@ -197,15 +197,6 @@ class EntryPanel(QMainWindow):
 
         self.panels = QWidget()
         self.panelsLayout = QGridLayout() 
-
-        self.panel_entry_names = [
-            "COMPANY", "CONTACT","E-MAIL",
-            "TOTAL BALANCE", "PAID",
-            "REMAINING", "PHONE NO.",
-            "BANK", "CHEQUE NO.", "NEW PAYMENT",
-            "DETAILS" 
-        ]
-
         self.panel_entry = []
 
         tabs = QTabWidget()
@@ -221,75 +212,41 @@ class EntryPanel(QMainWindow):
         tabs.addTab(self.tab3, "LOG")
         
         # Tab1 # TODO: add QCompleter to the text entries
-        item = EntryWidget(self.panel_entry_names[0])#Company Name
-        self.tab1Layout.addWidget(item,0,0,1,2)
+        item = EntryWidget("Company")#Company Name
+        self.tab1Layout.addWidget(item,0,0)
         self.panel_entry.append(item)
-        item = EntryWidget(self.panel_entry_names[1])#Contact Name
-        self.tab1Layout.addWidget(item,1,0)
+        item = EntryWidget("Contact")#Contact Name
+        self.tab1Layout.addWidget(item,0,1)
         self.panel_entry.append(item)
-        item = EntryWidget(self.panel_entry_names[2])#Email
+        item = EntryTextEditWidget("Address") # Address
+        item.tedit.setPlaceholderText("Enter company address here")
+        self.tab1Layout.addWidget(item,1,0,2,2)
+        self.panel_entry.append(item)
+        item = EntryWidget("E-Mail")#Email
         item.ledit.setPlaceholderText("name@company.com")
-        self.tab1Layout.addWidget(item,1,1)
+        self.tab1Layout.addWidget(item,3,0)
         self.panel_entry.append(item)
-        
-        # Tab2
-        item = EntrySpinBoxWidget(self.panel_entry_names[3])#"Total Balance"
-        self.tab2Layout.addWidget(item,0,0)
+        item = EntryWidget("Phone Number") # Phone No
+        # item.ledit.setPlaceholderText("+X-XXXXX-XXXXX")
+        self.tab1Layout.addWidget(item,3,1)
         self.panel_entry.append(item)
-        item = EntrySpinBoxWidget(self.panel_entry_names[4])#"Paid"
-        item.lbl.setStyleSheet("QLabel {font-weight: bold; color: #4ecca3;}")
-        self.tab2Layout.addWidget(item,0,1)
+        item = EntryWidget("Fax Number") # Fax No
+        # item.ledit.setPlaceholderText("+Y-XXXXX-XXXXX")
+        self.tab1Layout.addWidget(item,4,0)
         self.panel_entry.append(item)
-        item = EntrySpinBoxWidget(self.panel_entry_names[5])#"Remaining"
-        item.lbl.setStyleSheet("QLabel {font-weight: bold; color: #ff4866;}")
-        self.tab2Layout.addWidget(item,1,0)
+        """Opening Balance here""" # TODO move this to after user saves info
+        item = EntrySpinBoxWidget("Opening Balance")#"NEW Payment"
+        self.tab1Layout.addWidget(item,4,1)
         self.panel_entry.append(item)
-
-        # From tab1 but kept order the same as previous version to avoid changing list indexing in "panel_entry_names" in the class
-        item = EntryWidget(self.panel_entry_names[6]) # Phone No
-        item.ledit.setPlaceholderText("+Y-XXXXX-XXXXX")
-        self.tab1Layout.addWidget(item,2,0,1,1)
-        self.panel_entry.append(item)
-
-        # Tab2 continued
-        payment_label = QLabel("PAYMENT METHOD")
-        payment_label.setStyleSheet("QLabel {font-weight: bold;}")
-        self.tab2Layout.addWidget(payment_label,2,0)
-        self.payment_radio_setup = QWidget() # Cash/cheque widget
-        payment_method_layout = QHBoxLayout()
-        self.radio_button1 = QRadioButton("Cash")
-        self.radio_button1.setStyleSheet("QRadioButton {font-weight: bold;}")
-        self.radio_button1.setChecked(True)
-        self.radio_button1.toggled.connect(self.check_payment_method)
-        payment_method_layout.addWidget(self.radio_button1)
-        self.radio_button2 = QRadioButton("Cheque")
-        self.radio_button2.setStyleSheet("QRadioButton {font-weight: bold;}")
-        self.radio_button2.toggled.connect(self.check_payment_method)
-        payment_method_layout.addWidget(self.radio_button2)
-        self.payment_radio_setup.setLayout(payment_method_layout)
-        self.tab2Layout.addWidget(self.payment_radio_setup,3,0)
-
-        item = EntryWidget(self.panel_entry_names[7])# bank name
-        self.tab2Layout.addWidget(item,4,0)
-        self.panel_entry.append(item)
-        item = EntryWidget(self.panel_entry_names[8])# cheque no
-        self.tab2Layout.addWidget(item,4,1)
-        self.panel_entry.append(item)
-
-        # From tab2 but kept order the same as in "panel_entry_names" in the class to avoid correcting all number indexing of panel_entry items
-        item = EntrySpinBoxWidget(self.panel_entry_names[9])#"NEW Payment"
-        item.lbl.setStyleSheet("QLabel {font-weight: bold; color: #927fbf;}")
-        # palette = QPalette() # Doesn't work
-        # palette.setColor(QPalette.Text, QColor("#927fbf"))
-        # item.spin_box.setPalette(palette)
-        self.tab2Layout.addWidget(item,1,1)
-        self.panel_entry.append(item)
-
-        # From tab1 but kept order the same as previous version to avoid changing list indexing in "panel_entry_names" in the class
-        item = EntryTextEditWidget(self.panel_entry_names[10]) # Details
+        item = EntryTextEditWidget("Details") # Details
         item.tedit.setPlaceholderText("Add additional details here")
-        self.tab1Layout.addWidget(item,3,0,2,2)
+        self.tab1Layout.addWidget(item,5,0,2,2)
         self.panel_entry.append(item)
+        # Tab2
+        self.invoice_list_view = QListView()
+        # self.invoice_list_view.setReadOnly(True)
+        # self.log_textEdit.setStyleSheet("QTextEdit {font-weight: bold;}")
+        self.tab2Layout.addWidget(self.invoice_list_view)
 
         # Tab3
         self.log_textEdit = QTextEdit()
@@ -302,11 +259,11 @@ class EntryPanel(QMainWindow):
         self.tab2.setLayout(self.tab2Layout)
         self.tab3.setLayout(self.tab3Layout)
 
-        self.panel_entry[3].spin_box.valueChanged.connect(self.paid_fees_signal)
-        self.panel_entry[4].spin_box.valueChanged.connect(self.paid_fees_signal)
-        self.panel_entry[5].spin_box.valueChanged.connect(self.rem_fees_signal)
-        self.panel_entry[9].spin_box.setKeyboardTracking(False)
-        self.panel_entry[9].spin_box.valueChanged.connect(self.new_payment_signal)
+        # self.panel_entry[3].spin_box.valueChanged.connect(self.paid_fees_signal)
+        # self.panel_entry[4].spin_box.valueChanged.connect(self.paid_fees_signal)
+        # self.panel_entry[5].spin_box.valueChanged.connect(self.rem_fees_signal)
+        # self.panel_entry[9].spin_box.setKeyboardTracking(False)
+        # self.panel_entry[9].spin_box.valueChanged.connect(self.new_payment_signal)
         
         # Adding Save Button
         self.save_btn = QPushButton("Save")
@@ -363,43 +320,15 @@ class EntryPanel(QMainWindow):
         self.setGeometry(1500, 100, 1000*self.devicePixelRatio(),800*self.devicePixelRatio())
         self.setWindowTitle('Add New Entry')
 
-        self.check_payment_method()# check correct option selection and enabling of lineedits
+        # self.check_payment_method()# check correct option selection and enabling of lineedits
         # self.show()
-    
-    def check_payment_method(self):
-        if self.radio_button2.isChecked():#Cheque radio button
-            self.panel_entry[7].ledit.setEnabled(True)
-            self.panel_entry[8].ledit.setEnabled(True)
-        else:
-            self.panel_entry[7].ledit.setEnabled(False)
-            self.panel_entry[8].ledit.setEnabled(False)
+        self.centerOnScreen()
 
-
-    def paid_fees_signal(self):#sets remaining value
-        total = self.panel_entry[3].spin_box.value()
-        paid = self.panel_entry[4].spin_box.value()
-        if total-paid >= 0:
-            self.panel_entry[5].spin_box.setValue(float(total-paid))
-        else:
-            self.statusBar.showMessage("Error: Make sure the numbers are positive!", 2000)
-
-    def rem_fees_signal(self):#sets paid value
-        total = self.panel_entry[3].spin_box.value()
-        rem = self.panel_entry[5].spin_box.value()
-        if total-rem >= 0:
-            self.panel_entry[4].spin_box.setValue(float(total-rem))
-        else:
-            self.statusBar.showMessage("Error: Make sure the numbers are positive!", 2000)
-    
-    def new_payment_signal(self):
-        new_payment = self.panel_entry[9].spin_box.value()
-        paid = self.panel_entry[4].spin_box.value()
-        total = self.panel_entry[3].spin_box.value()
-        new_paid = paid + new_payment
-        if total - new_paid >= 0:
-            self.panel_entry[4].spin_box.setValue(new_paid)
-        else:
-            self.statusBar.showMessage("Error: Make sure the numbers are positive!", 2000)
+    def centerOnScreen (self):
+        '''centerOnScreen() Centers the window on the screen.'''
+        resolution = QDesktopWidget().screenGeometry()
+        self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+                  (resolution.height() / 2) - (self.frameSize().height() / 2)) 
 
     def open_invoice_dialog(self):
         new_invoice_dialog = InvoiceDialog(self)
@@ -408,38 +337,69 @@ class EntryPanel(QMainWindow):
         
         if ok and new_invoice_dialog.item_1.ledit.text() and new_invoice_dialog.item_3.spin_box.value() != 0:
             # TODO add to database
-            print(str(new_invoice_dialog.item_1.ledit.text()))
-            print(str(new_invoice_dialog.item_2.ledit.text()))
-            print(str(new_invoice_dialog.item_3.spin_box.value()))
-            print(str(new_invoice_dialog.item_4.calendar.selectedDate().toString()))
+            write_invoice_to_file(self, self.database_filename, self.idx_no,
+            str(new_invoice_dialog.item_1.ledit.text()),
+            str(new_invoice_dialog.item_2.ledit.text()),
+            float(new_invoice_dialog.item_3.spin_box.value()),
+            str(new_invoice_dialog.item_4.calendar.selectedDate().toString())
+            )
         elif ok and not new_invoice_dialog.item_1.ledit.text() and new_invoice_dialog.item_3.spin_box.value() == 0:
-            ask_user_to_reload(self, "No entry created - Invoice was left empty or Amount was 0")
+            inform_user(self, "Invoice field was left empty or Amount was 0.\n\n"+
+                "No new invoice was created.")
     
     def open_payment_dialog(self):
-        print("new payment")
         new_payment_dialog = PaymentDialog(self)
         new_payment_dialog.setWindowTitle("New Payment for "+ str(self.panel_entry[0].ledit.text()))
         ok = new_payment_dialog.exec_()
         # TODO write if else statements
-        if ok:
-            print("true")
+        if ok and new_payment_dialog.item_1.ledit.text() and new_payment_dialog.item_3.spin_box.value() != 0:
+            if new_payment_dialog.payment_entry_widget.radio_button1.isChecked():
+                payment_method = new_payment_dialog.payment_entry_widget.radio_button1.text()
+                bank_name = None
+                cheque_no = None
+            elif new_payment_dialog.payment_entry_widget.radio_button2.isChecked():
+                payment_method = new_payment_dialog.payment_entry_widget.radio_button2.text()
+                bank_name = new_payment_dialog.payment_entry_widget.bank_name.ledit.text()
+                cheque_no = new_payment_dialog.payment_entry_widget.cheque_no.ledit.text()
+            
+            remarks = new_payment_dialog.payment_entry_widget.remarks.tedit.toPlainText()
+            
+            write_new_payment(self, self.database_filename,
+            self.idx_no,
+            str(new_payment_dialog.item_1.ledit.text()),
+            str(new_payment_dialog.item_2.ledit.text()),
+            float(new_payment_dialog.item_3.spin_box.value()),
+            str(new_payment_dialog.item_4.calendar.selectedDate().toString()),
+            payment_method, bank_name, cheque_no, remarks            
+            )
+        elif ok and new_payment_dialog.item_3.spin_box.value() == 0:
+            inform_user(self, "Payment amount was '0'. Ener a valid payment amount")
+            self.open_payment_dialog()
+
+        elif ok and not new_payment_dialog.item_1.ledit.text():
+            inform_user(self, "No invoice number entered. Ener a valid invoice number")
+            self.open_payment_dialog()
     
-    def collect_widget_data(self):# TODO collect Log entries while editing and reading file
+    def _collect_widget_data(self):# TODO collect Log entries while editing and reading file
        company_name = self.panel_entry[0].ledit.text()
        contact_name =  self.panel_entry[1].ledit.text()
-       email =  self.panel_entry[2].ledit.text()
-       fees_ann = float(self.panel_entry[3].spin_box.value())
-       fees_paid = float(self.panel_entry[4].spin_box.value())
-       fees_rem = float(self.panel_entry[5].spin_box.value())
-       phone_no = self.panel_entry[6].ledit.text()
-       details = self.panel_entry[10].tedit.toPlainText()
-       # Read in database file to write in
+       address = self.panel_entry[2].tedit.toPlainText()
+       email =  self.panel_entry[3].ledit.text()
+       phone_no = self.panel_entry[4].ledit.text()
+       fax_no = self.panel_entry[5].ledit.text()
+       total_business = 0#float(self.panel_entry[3].spin_box.value())
+       total_paid = 0#float(self.panel_entry[4].spin_box.value())
+       outstanding = 0#float(self.panel_entry[5].spin_box.value())
+       details = self.panel_entry[7].tedit.toPlainText()
+    #    # Read in database file to write in
        data_pkl = read_file(self.database_filename)
+       self.idx_no = len(data_pkl) # for setting invoice through entry panel, otherwise there is no reference of index no in entry panel
        data_dict={
-           "Company Name": company_name, "Contact Name": contact_name, 
+           "Company Name": company_name, "Contact Name": contact_name,
+           "Address": address, 
            "Email": email, "Phone No.": phone_no, "Fax No.": fax_no,
-           "Total Business": fees_ann, "Total Paid": fees_paid, 
-           "Outstanding": fees_rem,"Details": details,
+           "Total Business": total_business, "Total Paid": total_paid, 
+           "Outstanding": outstanding,"Details": details,
            "Invoices":{},
            "Logs":{},
            "Price Quote Log":{}
@@ -448,8 +408,14 @@ class EntryPanel(QMainWindow):
        return data_pkl
 
     def update_database(self): #TODO: Catch user entering empty strings
-        data_pkl = self.collect_widget_data() # rerturns a pandas df
+        data_pkl = self._collect_widget_data()
         write_file(data_pkl, self.database_filename)
+        answer = QMessageBox.question(
+            self, None, "Do you want to create an opening balance for this company?", 
+            QMessageBox.Ok | QMessageBox.Cancel)
+        
+        if answer and QMessageBox.Ok:
+            self.open_invoice_dialog()
         # data_pkl.to_csv(self.database_filename, index = False)#, sheet_name="Sheet1")
         self.statusBar.showMessage("Entry Added!", 2000)
         for i in range(len(self.panel_entry)):
@@ -472,16 +438,16 @@ class EditViewPanel(EntryPanel):
 
         self.edit_checkbox.setVisible(True)
         self.edit_checkbox.stateChanged.connect(self.edit_or_view)
-        self.previous_data = self.get_data()
+        self.previous_data = self._get_data()
         self.populate_view(data=self.previous_data)
         if self.edit_true is True:
             self.edit_checkbox.setChecked(True)
         else:
             self.edit_checkbox.setChecked(False)
-        self.undo_btn.clicked.connect(self.undo_changes)
+        # self.undo_btn.clicked.connect(self.undo_changes)
         
         self.setWindowTitle('View/Edit Panel')
-        self.show()
+        # self.show()
     
     def edit_or_view(self):
         if self.edit_checkbox.isChecked():
@@ -489,8 +455,8 @@ class EditViewPanel(EntryPanel):
             self.new_payment_btn.setVisible(True)
             self.save_btn.setVisible(True)
             self.undo_btn.setVisible(True)
-            self.payment_radio_setup.setEnabled(True)
-            self.check_payment_method()
+            # self.payment_radio_setup.setEnabled(True)
+            # self.check_payment_method()
             for i in range(len(self.panel_entry)):
                 try:
                     try:
@@ -504,8 +470,8 @@ class EditViewPanel(EntryPanel):
             self.new_payment_btn.setVisible(False)
             self.save_btn.setVisible(False)
             self.undo_btn.setVisible(False)
-            self.payment_radio_setup.setEnabled(False)
-            self.check_payment_method()
+            # self.payment_radio_setup.setEnabled(False)
+            # self.check_payment_method()
             for i in range(len(self.panel_entry)):
                 try:
                     try:
@@ -515,137 +481,147 @@ class EditViewPanel(EntryPanel):
                 except:
                     self.panel_entry[i].spin_box.setReadOnly(True)
     
-    def get_data(self):
+    def _get_data(self):
         data_pkl = read_file(self.database_filename)
         company_name = data_pkl[int(self.idx_no)]["Company Name"]#.iloc[int(self.idx_no)]
         contact_name = data_pkl[int(self.idx_no)]["Contact Name"]
+        address = data_pkl[int(self.idx_no)]["Address"]
         email = data_pkl[int(self.idx_no)]["Email"]
-        fees_ann = data_pkl[int(self.idx_no)]["Total Balance"]
-        fees_paid = data_pkl[int(self.idx_no)]["Paid"]
-        fees_rem = data_pkl[int(self.idx_no)]["Remaining"]
         phone_no = data_pkl[int(self.idx_no)]["Phone No."]
+        fax_no = data_pkl[int(self.idx_no)]["Fax No."]
+        total_business = data_pkl[int(self.idx_no)]["Total Business"]
+        total_paid = data_pkl[int(self.idx_no)]["Total Paid"]
+        outstanding = data_pkl[int(self.idx_no)]["Outstanding"]
         details = data_pkl[int(self.idx_no)]["Details"]
         self.prev_log = data_pkl[int(self.idx_no)]["Logs"]
-        return company_name, contact_name, email, fees_ann, fees_paid, fees_rem, phone_no, details
+        return company_name, contact_name, address, email, phone_no, fax_no, total_business, total_paid, outstanding, details
     
     def populate_view(self, data):
-        company_name, contact_name, email, fees_ann, fees_paid, fees_rem, phone_no, details = data
+        company_name, contact_name, address, email, phone_no, fax_no, total_business, total_paid, outstanding, details = data
+    
         self.panel_entry[0].ledit.setText(str(company_name))
         self.panel_entry[1].ledit.setText(str(contact_name))
-        self.panel_entry[2].ledit.setText(str(email))
-        self.panel_entry[3].spin_box.setValue(float(fees_ann))
-        self.panel_entry[4].spin_box.setValue(float(fees_paid))
-        self.panel_entry[5].spin_box.setValue(float(fees_rem))
-        self.panel_entry[6].ledit.setText(str(phone_no))
-        self.panel_entry[10].tedit.setText(str(details))
-        self.set_log_text()
+        self.panel_entry[2].tedit.setText(str(address))
+        self.panel_entry[3].ledit.setText(str(email))
+        self.panel_entry[4].ledit.setText(str(phone_no))
+        self.panel_entry[5].ledit.setText(str(fax_no))
+        self.panel_entry[7].tedit.setText(str(details))
+
+        # self.panel_entry[3].spin_box.setValue(float(fees_ann))
+        # self.panel_entry[4].spin_box.setValue(float(fees_paid))
+        # self.panel_entry[5].spin_box.setValue(float(fees_rem))
+        # self.set_log_text()
         self.edit_or_view()
 
-    def set_log_text(self):#, x=None):
-        # if x is not None:
-        # #     self.search_text = x.lower()
-        # old_scroll_pos = self.log_textEdit.verticalScrollBar().value()
-        # print(old_scroll_pos)
-        self.log_str = ""  
-        #self.f.visititems(self._visitfunc)
-        self.traverse_dict(self.prev_log, self.prev_log, 0)
+    # def set_log_text(self):#, x=None): # TODO save a separate log file to keep track of everything
+    #     # if x is not None:
+    #     # #     self.search_text = x.lower()
+    #     # old_scroll_pos = self.log_textEdit.verticalScrollBar().value()
+    #     # print(old_scroll_pos)
+    #     self.log_str = ""  
+    #     #self.f.visititems(self._visitfunc)
+    #     self.traverse_dict(self.prev_log, self.prev_log, 0)
 
         
-        self.log_text_html = \
-        """<html><h4">{}</h4></hr>
-        <div>
-            {} 
-            </div>
-            </html>""".format("Payment Log", self.log_str)
+    #     self.log_text_html = \
+    #     """<html><h4">{}</h4></hr>
+    #     <div>
+    #         {} 
+    #         </div>
+    #         </html>""".format("Payment Log", self.log_str)
         
-        self.log_textEdit.setText(self.log_text_html) #; font-size: 40px;
-        self.log_textEdit.verticalScrollBar().setValue(self.log_textEdit.verticalScrollBar().maximum())
+    #     self.log_textEdit.setText(self.log_text_html) #; font-size: 40px;
+    #     self.log_textEdit.verticalScrollBar().setValue(self.log_textEdit.verticalScrollBar().maximum())
 
-    def traverse_dict(self, dictionary, previous_dict, level):
-        """
-        Visit all values in the dictionary and its subdictionaries.
-        dictionary -- dictionary to traverse
-        previous_dict -- dictionary one level up
-        level -- track how far to indent 
-        """
-        for key in dictionary:
-            if key not in previous_dict:
-                level -=1
-            indent = "&nbsp;"*4*(level)
+    # def traverse_dict(self, dictionary, previous_dict, level):
+    #     """
+    #     Visit all values in the dictionary and its subdictionaries.
+    #     dictionary -- dictionary to traverse
+    #     previous_dict -- dictionary one level up
+    #     level -- track how far to indent 
+    #     """
+    #     for key in dictionary:
+    #         if key not in previous_dict:
+    #             level -=1
+    #         indent = "&nbsp;"*4*(level)
 
-            if type(dictionary[key]) == dict:
-                print_string = key
-                # if self.search_text and self.search_text in print_string:
-                #     self.tree_str += indent + """<span style="color: red;">{}</span>""".format(print_string)
-                # else:
-                self.log_str += indent + """> <b>{}/</b><br/>""".format(print_string)
-                level += 1
-                previous_dict = dictionary[key]
-                self.traverse_dict(dictionary[key], previous_dict, level)
-            else:
-                value = dictionary[key]
+    #         if type(dictionary[key]) == dict:
+    #             print_string = key
+    #             # if self.search_text and self.search_text in print_string:
+    #             #     self.tree_str += indent + """<span style="color: red;">{}</span>""".format(print_string)
+    #             # else:
+    #             self.log_str += indent + """> <b>{}/</b><br/>""".format(print_string)
+    #             level += 1
+    #             previous_dict = dictionary[key]
+    #             self.traverse_dict(dictionary[key], previous_dict, level)
+    #         else:
+    #             value = dictionary[key]
 
-                print_string = key + " : " + str(value)
-                # if self.search_text and self.search_text in print_string:
-                    # self.tree_str += indent + """<span style="color: red;">{}</span>""".format(print_string)
-                # else:
-                if key == "Closing Balance":
-                    self.log_str += indent + ">"+ """<b style="color: #4ecca3;"> {}</b><br/>""".format(print_string)
-                elif key == "Opening Balance":
-                    self.log_str += indent + ">"+ """<b style="color: #ff4866;"> {}</b><br/>""".format(print_string)
-                elif key == "Payment Amount":
-                    self.log_str += indent + ">"+ """<b style="color: #927fbf;"> {}</b><br/>""".format(print_string)
-                else:
-                    self.log_str += indent + ">"+ """<b> {}</b><br/>""".format(print_string)
+    #             print_string = key + " : " + str(value)
+    #             # if self.search_text and self.search_text in print_string:
+    #                 # self.tree_str += indent + """<span style="color: red;">{}</span>""".format(print_string)
+    #             # else:
+    #             if key == "Closing Balance":
+    #                 self.log_str += indent + ">"+ """<b style="color: #4ecca3;"> {}</b><br/>""".format(print_string)
+    #             elif key == "Opening Balance":
+    #                 self.log_str += indent + ">"+ """<b style="color: #ff4866;"> {}</b><br/>""".format(print_string)
+    #             elif key == "Payment Amount":
+    #                 self.log_str += indent + ">"+ """<b style="color: #927fbf;"> {}</b><br/>""".format(print_string)
+    #             else:
+    #                 self.log_str += indent + ">"+ """<b> {}</b><br/>""".format(print_string)
 
     def collect_widget_data(self):
        company_name = self.panel_entry[0].ledit.text()
        contact_name =  self.panel_entry[1].ledit.text()
-       email =  self.panel_entry[2].ledit.text()
-       fees_ann = float(self.panel_entry[3].spin_box.value())
-       fees_paid = float(self.panel_entry[4].spin_box.value())
-       fees_rem = float(self.panel_entry[5].spin_box.value())
-       phone_no = self.panel_entry[6].ledit.text()
-       payment = float(self.panel_entry[9].spin_box.value())
-       details = self.panel_entry[10].tedit.toPlainText()
+       address = self.panel_entry[2].tedit.toPlainText()
+       email =  self.panel_entry[3].ledit.text()
+       phone_no = self.panel_entry[4].ledit.text()
+       fax_no = self.panel_entry[5].ledit.text()
+       total_business = 0#float(self.panel_entry[3].spin_box.value())
+       total_paid = 0#float(self.panel_entry[4].spin_box.value())
+       outstanding = 0#float(self.panel_entry[5].spin_box.value())
+       details = self.panel_entry[7].tedit.toPlainText()
 
        data_pkl = read_file(self.database_filename)
-       prev_balance = data_pkl[int(self.idx_no)]["Remaining"]
+    #    prev_balance = data_pkl[int(self.idx_no)]["Remaining"]
+
        data_pkl[int(self.idx_no)]["Company Name"] = company_name
        data_pkl[int(self.idx_no)]["Contact Name"] = contact_name
+       data_pkl[int(self.idx_no)]["Address"] = address
        data_pkl[int(self.idx_no)]["Email"] = email
-       data_pkl[int(self.idx_no)]["Total Balance"] = fees_ann
-       data_pkl[int(self.idx_no)]["Paid"] = fees_paid
-       data_pkl[int(self.idx_no)]["Remaining"] =  fees_rem
        data_pkl[int(self.idx_no)]["Phone No."] =  phone_no
+       data_pkl[int(self.idx_no)]["Fax No."] =  fax_no
+    #    data_pkl[int(self.idx_no)]["Total Balance"] = fees_ann
+    #    data_pkl[int(self.idx_no)]["Paid"] = fees_paid
+    #    data_pkl[int(self.idx_no)]["Remaining"] =  fees_rem
        data_pkl[int(self.idx_no)]["Details"] =  details
        
-       if prev_balance != fees_rem: # only log payments if there has been a change in the balance
-           new_log = {}
-           new_log["Record Date"] = date.today().strftime("%B %d, %Y")
-           new_log["Opening Balance"] = prev_balance
-           new_log["Closing Balance"] = fees_rem
-           new_log["Payment Amount"] = payment
-           if self.radio_button1.isChecked():
-               new_log["Payment Method"] = self.radio_button1.text()
-           if self.radio_button2.isChecked():
-               new_log["Payment Method"] = self.radio_button2.text()
-               new_log["Details"] = {}
-               new_log["Details"]['Bank Name'] = self.panel_entry[7].ledit.text()
-               new_log["Details"]['Cheque Number'] = self.panel_entry[8].ledit.text()
+    #    if prev_balance != fees_rem: # only log payments if there has been a change in the balance
+    #        new_log = {}
+    #        new_log["Record Date"] = date.today().strftime("%B %d, %Y")
+    #        new_log["Opening Balance"] = prev_balance
+    #        new_log["Closing Balance"] = fees_rem
+    #        new_log["Payment Amount"] = payment
+    #        if self.radio_button1.isChecked():
+    #            new_log["Payment Method"] = self.radio_button1.text()
+    #        if self.radio_button2.isChecked():
+    #            new_log["Payment Method"] = self.radio_button2.text()
+    #            new_log["Details"] = {}
+    #            new_log["Details"]['Bank Name'] = self.panel_entry[7].ledit.text()
+    #            new_log["Details"]['Cheque Number'] = self.panel_entry[8].ledit.text()
 
-           data_pkl[int(self.idx_no)]["Logs"]["Log"+str(len(data_pkl[int(self.idx_no)]["Logs"])+1)] = new_log
+    #        data_pkl[int(self.idx_no)]["Logs"]["Log"+str(len(data_pkl[int(self.idx_no)]["Logs"])+1)] = new_log
        return data_pkl
 
     def update_database(self):
         data_pkl = self.collect_widget_data()
-        self.panel_entry[9].spin_box.setValue(0.00)#set payment spinbox to 0 after saving
+        # self.panel_entry[9].spin_box.setValue(0.00)#set payment spinbox to 0 after saving
         write_file(data_pkl,self.database_filename)
         self.statusBar.showMessage("Edited & Saved!", 2000)
-        self.populate_view(self.get_data())
-        ask_user_to_reload(self, "Entry updated. You may now reload.")
+        self.populate_view(self._get_data())
+        inform_user(self, "Entry updated. You may now reload.")
         self.close()
 
     def undo_changes(self):
         self.populate_view(self.previous_data)# set it to previous data # TODO : should take care of details text edit too
-        self.panel_entry[9].spin_box.setValue(0.00)#set payment spinbox to 0 after saving
+        # self.panel_entry[9].spin_box.setValue(0.00)#set payment spinbox to 0 after saving

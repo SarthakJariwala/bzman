@@ -11,6 +11,7 @@ from util import read_file, write_file
 import breeze_resources
 import functools
 import operator
+import cProfile
 
 class AppContext(ApplicationContext):
     def run(self):
@@ -31,7 +32,7 @@ class AppContext(ApplicationContext):
     
     @cached_property
     def get_demo_data(self):
-        return self.get_resource('Name_list.json')
+        return self.get_resource('Company_database.json')
 
     @cached_property
     def get_breeze_dark(self):
@@ -147,6 +148,13 @@ class WelcomeWindow(QMainWindow):
         options.addAction(font)
 
         self.setGeometry(800,100,1000*self.devicePixelRatio(),1000*self.devicePixelRatio())
+        self.centerOnScreen()
+
+    def centerOnScreen (self):
+        '''centerOnScreen() Centers the window on the screen.'''
+        resolution = QDesktopWidget().screenGeometry()
+        self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+                  (resolution.height() / 2) - (self.frameSize().height() / 2)) 
     
     def load_file(self):
         filename = QFileDialog.getOpenFileName(self, "Open", filter="Database Files (*.json)")[0]
@@ -156,7 +164,7 @@ class WelcomeWindow(QMainWindow):
             self.main_window.show()
             self.setWindowState(Qt.WindowMinimized)
     
-    def new_file(self):
+    def new_file(self): # TODO change this to inputdialog
         filename = QFileDialog.getSaveFileName(self, "New - Enter Filename You Want to Use")[0]#, filter="Scan files (*.pkl *.h5 *.txt)")
         if filename:
             self.database_filename = filename+".json"
@@ -269,6 +277,13 @@ class MainWindow(QMainWindow):
 
         self.setGeometry(800, 100, 1500*self.devicePixelRatio(), 1500*self.devicePixelRatio())
         self.setWindowTitle('BZMAN')
+        self.centerOnScreen()
+
+    def centerOnScreen (self):
+        '''centerOnScreen() Centers the window on the screen.'''
+        resolution = QDesktopWidget().screenGeometry()
+        self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+                  (resolution.height() / 2) - (self.frameSize().height() / 2)) 
     
     def load(self):
         #data_pkl = pd.ExcelFile(self.database_filename)
@@ -276,25 +291,22 @@ class MainWindow(QMainWindow):
         data_pkl = read_file(self.database_filename)
         company_names = []
         contact_names = []
-        rem_fees = []
+        outstanding = []
         for i in range(len(data_pkl)):
             company_names.append(data_pkl[i]["Company Name"])
             contact_names.append(data_pkl[i]["Contact Name"])
-            rem_fees.append(data_pkl[i]["Remaining"])
-        return company_names, contact_names, rem_fees
+            outstanding.append(data_pkl[i]["Outstanding"])
+        return company_names, contact_names, outstanding
     
     def load_widgets(self):
-        company_names,contact_names,rem_fees = self.load()
-        self.widget_names = functools.reduce(operator.iconcat, [company_names, contact_names, str(rem_fees)], [])
+        company_names,contact_names,outstanding = self.load()
+        self.widget_names = functools.reduce(operator.iconcat, [company_names, contact_names, str(outstanding)], [])
         self.widgets = []
         idx_numbers = list(range(0,len(company_names)))
 
-        # Iterate the names, creating a new OnOffWidget for 
-        # each one, adding it to the layout and 
-        # and storing a reference in the `self.widgets` list
-        for idx_no, company_name, contact_name, rem_fee in list(zip(idx_numbers, company_names, contact_names, rem_fees)):
-            # item = [idx_no, company_name, contact_names]
-            item = MasterViewerWidget(idx_no, company_name, contact_name, rem_fee, database_filename=self.database_filename, ctx=self.ctx)#in the future, can reduce redundancy by only passing ctx and creating a function in Appctxt that reads database filename
+        for idx_no, company_name, contact_name, rem_bal in list(zip(idx_numbers, company_names, contact_names, outstanding)):
+            # TODO Load Widgets on a different thread
+            item = MasterViewerWidget(idx_no, company_name, contact_name, rem_bal, database_filename=self.database_filename, ctx=self.ctx)#in the future, can reduce redundancy by only passing ctx and creating a function in Appctxt that reads database filename
             self.controlsLayout.addWidget(item)
             self.widgets.append(item)
         
@@ -371,8 +383,10 @@ def run():
         appctxt.app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
         # w = WelcomeWindow()
         # w.show()
-        print(time()-start_time)
+        print("starting app took :" + str(time()-start_time))
         exit_code = appctxt.run()      # 2. Invoke appctxt.app.exec_()
         sys.exit(exit_code)
 
 run()
+# For debugging uncomment below
+# cProfile.run("run()", sort="cumtime")

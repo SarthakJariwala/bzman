@@ -3,16 +3,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import json
-from util import read_file, write_file
-from panels import EditViewPanel, InvoiceDialog, PaymentDialog
-from datetime import date
-# import qtmodern.windows
-
-def ask_user_to_reload(parent, text):
-    QMessageBox.information(
-        parent, None, text,
-        QMessageBox.Ok
-    )
+from util import read_file, write_file, write_invoice_to_file, inform_user
+from panels import EntryPanel, EditViewPanel, InvoiceDialog, PaymentDialog
 
 class MasterViewerWidget(QWidget):
 
@@ -96,32 +88,15 @@ class MasterViewerWidget(QWidget):
         #self.update_button_state()
 
     def new_invoice (self):
-        print('New Invoice')
         # dlg = QInputDialog.getText(self, 'Enter a new invoice for '+ str(self.company_name), 
         # 'Invoice Number:')
         # invoice_no, ok = dlg.exec_()
-        new_invoice_dialog = InvoiceDialog(self)
-        new_invoice_dialog.setWindowTitle('New invoice for '+ str(self.company_name))
-        ok = new_invoice_dialog.exec_()
-        
-        if ok and new_invoice_dialog.item_1.ledit.text() and new_invoice_dialog.item_3.spin_box.value() != 0:
-            # TODO add to database
-            print(str(new_invoice_dialog.item_1.ledit.text()))
-            print(str(new_invoice_dialog.item_2.ledit.text()))
-            print(str(new_invoice_dialog.item_3.spin_box.value()))
-            print(str(new_invoice_dialog.item_4.calendar.selectedDate().toString()))
-        elif ok and not new_invoice_dialog.item_1.ledit.text() and new_invoice_dialog.item_3.spin_box.value() == 0:
-            ask_user_to_reload(self, "No entry created - Invoice was left empty or Amount was 0")
+        new_invoice_dialog = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
+        new_invoice_dialog.open_invoice_dialog()
     
-    def new_payment(self): # TODO Launch edit panelt directly
-        print("new payment")
-        new_payment_dialog = PaymentDialog(self)
-        new_payment_dialog.setWindowTitle("New Payment for "+ str(self.company_name))
-        ok = new_payment_dialog.exec_()
-        # TODO write if else statements
-
-        if ok:
-            print("true")
+    def new_payment(self):
+        payment = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
+        payment.open_payment_dialog()
         
     def quick_summary(self):
         print("Quick summary")
@@ -143,7 +118,7 @@ class MasterViewerWidget(QWidget):
             data_pkl = read_file(self.database_filename)
             data_pkl.pop(int(self.idx_no))
             write_file(data_pkl, self.database_filename)
-            ask_user_to_reload(self, "Entry Deleted! You may now reload.")
+            inform_user(self, "Entry Deleted! You may now reload.")
 
     def show(self):
         """
