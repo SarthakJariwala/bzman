@@ -30,6 +30,12 @@ def read_file(filename):
         print("Reading file took: "+ str(time() - start_time))
     return json_file
 
+def get_company_summary(filename, index):
+    data_pkl = read_file(filename)
+    paid = data_pkl[int(index)]['Total Paid']
+    outstanding = data_pkl[int(index)]["Outstanding"]
+    return paid, outstanding
+
 def write_invoice_to_file(parent, filename, index, invoice_no, po_no, amount, date):
     data_pkl = read_file(filename)
     existing_invoice_no = []

@@ -4,18 +4,25 @@ from PyQt5.QtCore import *#Qt
 from PyQt5.QtGui import *#QPainter, QPen
 import sys
 
-class Window(QMainWindow):
+class PieWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, paid, outstanding):
+        self.paid = paid
+        self.outstanding = outstanding
         super().__init__()
 
-        self.setWindowTitle('Pie Chart Demo')
+        # self.setWindowTitle('BZMAN Quick Summary')
 
-        piechart = DrawPieChart(paid=3000, outstanding=7000)
+        piechart = DrawPieChart(self.paid, self.outstanding)
 
-        self.setCentralWidget(piechart.draw_pie_chart())
+        pie_widget = QWidget()
+        grid_layout = QGridLayout()
+        grid_layout.addWidget(piechart.draw_pie_chart(), 0,0, 5,1)
+        pie_widget.setLayout(grid_layout)
 
-        self.show()
+        self.setCentralWidget(pie_widget)
+        self.setGeometry(800, 100, 1000*self.devicePixelRatio(),1000*self.devicePixelRatio())
+        # self.show()
 
 class DrawPieChart(QGraphicsWidget):
     def __init__(self, paid, outstanding):
@@ -70,5 +77,5 @@ class DrawPieChart(QGraphicsWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win = Window()
+    win = PieWindow(3000,7000)
     sys.exit(app.exec_())

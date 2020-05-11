@@ -3,8 +3,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import json
-from util import read_file, write_file, write_invoice_to_file, inform_user
+from util import read_file, write_file, write_invoice_to_file, inform_user, get_company_summary
 from panels import EntryPanel, EditViewPanel, InvoiceDialog, PaymentDialog
+from charts import PieWindow
 
 class MasterViewerWidget(QWidget):
 
@@ -88,9 +89,6 @@ class MasterViewerWidget(QWidget):
         #self.update_button_state()
 
     def new_invoice (self):
-        # dlg = QInputDialog.getText(self, 'Enter a new invoice for '+ str(self.company_name), 
-        # 'Invoice Number:')
-        # invoice_no, ok = dlg.exec_()
         new_invoice_dialog = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
         new_invoice_dialog.open_invoice_dialog()
     
@@ -100,6 +98,11 @@ class MasterViewerWidget(QWidget):
         
     def quick_summary(self):
         print("Quick summary")
+        paid, outstanding = get_company_summary(self.database_filename, self.idx_no)
+        self.pie_chart = PieWindow(paid, outstanding)
+        self.pie_chart.setWindowTitle("Quick Summary for "+str(self.company_name))
+        self.pie_chart.show()
+        
 
     def open_view_window(self):
         self.view_window = EditViewPanel(self.idx_no, False, self.database_filename, self.ctx)

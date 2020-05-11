@@ -6,9 +6,9 @@
         "Email": "",
         "Phone No.": "",
         "Fax No.": "",
-        "Total Business": 41000.0,
+        "Total Business": 43000.0,
         "Total Paid": 4300.0,
-        "Outstanding": 36700.0,
+        "Outstanding": 38700.0,
         "Details": "",
         "Invoices": {
             "Invoice 1": {
@@ -89,6 +89,14 @@
                         "Remarks": ""
                     }
                 }
+            },
+            "Invoice 5": {
+                "Invoice No": "ABCDEFG",
+                "P/O ref": "",
+                "Invoice Amount": 2000.0,
+                "Outstanding": 2000.0,
+                "Issue Date": "Sun May 10 2020",
+                "Payments": {}
             }
         },
         "Logs": {},
@@ -101,9 +109,9 @@
         "Email": "",
         "Phone No.": "",
         "Fax No.": "",
-        "Total Business": 1000.0,
+        "Total Business": 11000.0,
         "Total Paid": 1000.0,
-        "Outstanding": 0.0,
+        "Outstanding": 10000.0,
         "Details": "",
         "Invoices": {
             "Invoice 1": {
@@ -161,6 +169,14 @@
                         "Remarks": ""
                     }
                 }
+            },
+            "Invoice 4": {
+                "Invoice No": "123456",
+                "P/O ref": "1234",
+                "Invoice Amount": 10000.0,
+                "Outstanding": 10000.0,
+                "Issue Date": "Sun May 10 2020",
+                "Payments": {}
             }
         },
         "Logs": {},
