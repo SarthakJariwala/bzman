@@ -207,8 +207,8 @@ class EntryPanel(QMainWindow):
         self.tab2Layout = QGridLayout()
         self.tab3 = QWidget()
         self.tab3Layout = QGridLayout()
-        tabs.addTab(self.tab1, "INFORMATION")
-        tabs.addTab(self.tab2, "PAYMENT")
+        tabs.addTab(self.tab1, "Information")
+        tabs.addTab(self.tab2, "Invoices")
         tabs.addTab(self.tab3, "LOG")
         
         # Tab1 # TODO: add QCompleter to the text entries
@@ -244,6 +244,8 @@ class EntryPanel(QMainWindow):
         self.panel_entry.append(item)
         # Tab2
         self.invoice_list_view = QListView()
+        self.invoice_model = QStandardItemModel(self.invoice_list_view)
+        self.invoice_list_view.setModel(self.invoice_model)
         # self.invoice_list_view.setReadOnly(True)
         # self.log_textEdit.setStyleSheet("QTextEdit {font-weight: bold;}")
         self.tab2Layout.addWidget(self.invoice_list_view)
@@ -258,12 +260,6 @@ class EntryPanel(QMainWindow):
         self.tab1.setLayout(self.tab1Layout)
         self.tab2.setLayout(self.tab2Layout)
         self.tab3.setLayout(self.tab3Layout)
-
-        # self.panel_entry[3].spin_box.valueChanged.connect(self.paid_fees_signal)
-        # self.panel_entry[4].spin_box.valueChanged.connect(self.paid_fees_signal)
-        # self.panel_entry[5].spin_box.valueChanged.connect(self.rem_fees_signal)
-        # self.panel_entry[9].spin_box.setKeyboardTracking(False)
-        # self.panel_entry[9].spin_box.valueChanged.connect(self.new_payment_signal)
         
         # Adding Save Button
         self.save_btn = QPushButton("Save")
@@ -494,6 +490,13 @@ class EditViewPanel(EntryPanel):
         outstanding = data_pkl[int(self.idx_no)]["Outstanding"]
         details = data_pkl[int(self.idx_no)]["Details"]
         self.prev_log = data_pkl[int(self.idx_no)]["Logs"]
+        
+        # self.existing_invoice_no = []
+        if len(data_pkl[int(self.idx_no)]["Invoices"]) > 0:
+            for i in range(len(data_pkl[int(self.idx_no)]["Invoices"])):
+                item = QStandardItem(data_pkl[int(self.idx_no)]["Invoices"]["Invoice "+str(i+1)]["Invoice No"])
+                self.invoice_model.appendRow(item)
+
         return company_name, contact_name, address, email, phone_no, fax_no, total_business, total_paid, outstanding, details
     
     def populate_view(self, data):
@@ -618,6 +621,9 @@ class EditViewPanel(EntryPanel):
         # self.panel_entry[9].spin_box.setValue(0.00)#set payment spinbox to 0 after saving
         write_file(data_pkl,self.database_filename)
         self.statusBar.showMessage("Edited & Saved!", 2000)
+        self.reload()
+        
+    def reload(self):
         self.populate_view(self._get_data())
         inform_user(self, "Entry updated. You may now reload.")
         self.close()
