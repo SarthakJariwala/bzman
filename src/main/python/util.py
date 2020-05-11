@@ -3,10 +3,17 @@ from PyQt5.QtWidgets import *
 from time import time
 
 def inform_user(parent, text):
-    QMessageBox.information(
+    ans = QMessageBox.information(
         parent, None, text,
         QMessageBox.Ok
     )
+    return ans
+
+def ask_user(parent, text):
+    ans = QMessageBox.question(
+        parent, None, text, 
+        QMessageBox.Ok | QMessageBox.Cancel)
+    return ans
 
 def write_file(obj, filename):
     """takes a list obj and saves a json file"""

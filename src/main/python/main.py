@@ -1,5 +1,6 @@
 from fbs_runtime.application_context.PyQt5 import ApplicationContext, cached_property
 import sys
+import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -7,7 +8,8 @@ from customwidgets import MasterViewerWidget
 from panels import EntryPanel
 from tutorial import Tutorial
 import qdarkstyle
-from util import read_file, write_file
+from util import read_file, write_file, ask_user, inform_user
+from charts import DrawPieChart
 import breeze_resources
 import functools
 import operator
@@ -129,25 +131,33 @@ class WelcomeWindow(QMainWindow):
         self.setStatusBar(QStatusBar(self))
 
         menu = self.menuBar()
+        menu_font_size = menu.font()
+        menu_font_size.setPointSize(10)
+        menu.setFont(menu_font_size)
         menu.setNativeMenuBar(False) # for mac
         file_menu = menu.addMenu("&File")
+        file_menu.setFont(menu_font_size)
         file_menu.addAction(new_action)
         file_menu.addAction(load_action)
         file_menu.addAction(load_demo)
 
         tutorial = menu.addMenu("Tutorial")
+        tutorial.setFont(menu_font_size)
         tutorial.addAction(tu_add_new_entry_acc)
         tutorial.addAction(tu_edit_entry_acc)
 
         options = menu.addMenu("&Customize")
+        options.setFont(menu_font_size)
         theme = options.addMenu("Theme")
+        theme.setFont(menu_font_size)
         theme.addAction(dark_theme)
         theme.addAction(breeze_dark)
         theme.addAction(breeze_light)
         theme.addAction(blue)
         options.addAction(font)
 
-        self.setGeometry(800,100,1000*self.devicePixelRatio(),1000*self.devicePixelRatio())
+        # self.setGeometry(800,100,2000*self.devicePixelRatio(),1000*self.devicePixelRatio())
+        self.setWindowState(Qt.WindowMaximized)
         self.centerOnScreen()
 
     def centerOnScreen (self):
@@ -157,22 +167,69 @@ class WelcomeWindow(QMainWindow):
                   (resolution.height() / 2) - (self.frameSize().height() / 2)) 
     
     def load_file(self):
-        filename = QFileDialog.getOpenFileName(self, "Open", filter="Database Files (*.json)")[0]
+        x = [os.path.abspath(f) for f in os.listdir() if os.path.isfile(f)]
+        temp_list =[]
+        filename = None
+        for i in range(len(x)):
+            if x[i].find("_BZMAN_DATABASE.json") != -1:
+                temp_list.append(x[i])
+        
+        if len(temp_list) >1:
+            inform_user(self, "There are more than one database files. Please select the one you want to open")
+            filename = QFileDialog.getOpenFileName(self, "Open", filter="Database Files (*.json)")[0]
+
+        elif len(temp_list) == 0:
+            ans = ask_user(self, "No Company Database found! \n\n" + "If you haven't created a company database yet, you can do it using 'New' option. Click 'Ok' to create a new database.\n\n"+
+            "If you have already created a Database but moved it to a differenct location, please open it manually by clicking 'Cancel'.")
+            if ans == QMessageBox.Ok:
+                self.new_file()
+            else:
+                filename = QFileDialog.getOpenFileName(self, "Open", filter="Database Files (*.json)")[0]
+
+        else:
+            filename = temp_list[0]
+
         if filename:
             self.main_window = MainWindow(filename, self.ctx)
-            # self.main_window = qtmodern.windows.ModernWindow(self.main_window)
             self.main_window.show()
             self.setWindowState(Qt.WindowMinimized)
     
-    def new_file(self): # TODO change this to inputdialog
-        filename = QFileDialog.getSaveFileName(self, "New - Enter Filename You Want to Use")[0]#, filter="Scan files (*.pkl *.h5 *.txt)")
-        if filename:
-            self.database_filename = filename+".json"
-            new_database = list()
-            write_file(new_database, self.database_filename)
-            # new_database.to_csv(self.database_filename, index=False)
-            self.entry_panel = EntryPanel(self.database_filename, self.ctx)
-            self.entry_panel.show()
+    def new_file(self, called_from_tutorial = False):
+        answer = ask_user(
+            self, "Is this your first time using BZMAN? \n"+ 
+            "If yes, would you like a guided tutorial to create your first entry? "+
+            "Click 'Ok' for a guided tutorial.\n\nClick 'Cancel' to continue.")
+        
+        if answer == QMessageBox.Ok:
+            self.tu_create_new_file()
+        
+        else:
+            dlg =  QInputDialog(self)                 
+            dlg.setInputMode(QInputDialog.TextInput) 
+            dlg.setWindowTitle('New Database : Enter Your Company Name')
+            dlg.setLabelText('Company Name')                        
+            dlg.resize(800,100)                             
+            ok = dlg.exec_()                                
+            filename = dlg.textValue()
+            # filename = QFileDialog.getSaveFileName(self, "New - Enter Filename You Want to Use")[0]#, filter="Scan files (*.pkl *.h5 *.txt)")
+            if ok and filename:
+                filename = os.path.join(os.getcwd() + "/" + filename)
+                self.database_filename = filename+"_BZMAN_DATABASE.json"
+                new_database = list()
+                write_file(new_database, self.database_filename)
+                ans = inform_user(self, "Great! Company database created!\n\n"+
+                "In future, you may click on the 'Open' option to directly open this file.\n"+
+                "Click 'Ok' to open it.")
+                if ans == QMessageBox.Ok:
+                    self.load_file()
+                    ans = ask_user(self, "There are no entries in your company database.\n\n"+
+                    "You can now add a new customer by clicking on 'Create New Customer' option in the top left or by clicking 'Ok'.\n")
+                    if ans == QMessageBox.Ok:
+                        self.entry_panel = EntryPanel(self.database_filename, self.ctx)
+                        self.entry_panel.show() #move this after opening file
+            
+            if ok and not filename:
+                inform_user(self, "Company name was left blank. \nEnter a valid name.")
     
     def load_demo(self):
         self.main_window = MainWindow(self.ctx.get_demo_data, self.ctx)
@@ -203,17 +260,20 @@ class WelcomeWindow(QMainWindow):
         if valid:
             self.ctx.app.setFont(font)
     
-    def tu_add_new_entry(self):
+    def tu_create_new_file(self): #FIXME needs fixing due to new changes to new_file function
         self.tu = Tutorial()
         ans = self.tu.start_tutorial(parent = self)
 
-        if ans == QMessageBox.Ok:
-            print("yes begin tutorial")
-            self.new_file()
-            self.tu.new_entry(parent=self)
+        if ans and QMessageBox.Ok:
+            print("yes inside tutorial")
+            # self.new_file()
+            
+    def tu_add_new_entry(self):
+        self.tu = Tutorial()
+        self.tu.new_entry(parent=self)
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow): #TODO add file menu with different options here too
 
     def __init__(self, database_filename, ctx, *args, **kwargs):
         super().__init__()
@@ -223,11 +283,14 @@ class MainWindow(QMainWindow):
         self.widgets = []
         self.widget_names = []
 
+        self.pie_view = QWidget()
+        self.pie_view_layout = QGridLayout()
         self.controls = QWidget()  # Controls container widget.
         self.controlsLayout = QGridLayout()   # Controls container layout.
 
         self.load_widgets()
         self.controls.setLayout(self.controlsLayout)
+        self.pie_view.setLayout(self.pie_view_layout)
 
         self.load_scroll_area()
 
@@ -264,18 +327,26 @@ class MainWindow(QMainWindow):
         hbox1.addWidget(self.delete_checkbox)
         btn_container.setLayout(hbox1)
 
+        pie_w_control = QWidget()
+        pie_w_control_layout = QHBoxLayout()
+        pie_w_control_layout.addWidget(self.pie_view)
+        pie_w_control_layout.addWidget(self.scroll)
+        pie_w_control.setLayout(pie_w_control_layout)
         # Add the items to VBoxLayout (applied to container widget) 
         # which encompasses the whole window.
         container = QWidget()
         containerLayout = QVBoxLayout()
         containerLayout.addWidget(btn_container)
         containerLayout.addWidget(self.searchbar)
-        containerLayout.addWidget(self.scroll)
+        # containerLayout.addWidget(self.overall_view_widget)
+        # containerLayout.addWidget(self.scroll)
+        containerLayout.addWidget(pie_w_control)
 
         container.setLayout(containerLayout)
         self.setCentralWidget(container)
 
-        self.setGeometry(800, 100, 1500*self.devicePixelRatio(), 1500*self.devicePixelRatio())
+        # self.setGeometry(800, 100, 1500*self.devicePixelRatio(), 1500*self.devicePixelRatio())
+        self.setWindowState(Qt.WindowMaximized)
         self.setWindowTitle('BZMAN')
         self.centerOnScreen()
 
@@ -286,28 +357,34 @@ class MainWindow(QMainWindow):
                   (resolution.height() / 2) - (self.frameSize().height() / 2)) 
     
     def load(self):
-        #data_pkl = pd.ExcelFile(self.database_filename)
-        #data_pkl = data_pkl.parse("Sheet1")
         data_pkl = read_file(self.database_filename)
         company_names = []
         contact_names = []
         outstanding = []
+        paid = []
         for i in range(len(data_pkl)):
             company_names.append(data_pkl[i]["Company Name"])
             contact_names.append(data_pkl[i]["Contact Name"])
             outstanding.append(data_pkl[i]["Outstanding"])
-        return company_names, contact_names, outstanding
+            paid.append(data_pkl[i]["Total Paid"])
+        
+        total_outstanding = sum(outstanding)
+        total_paid = sum(paid)
+        return company_names, contact_names, outstanding, total_outstanding, total_paid
     
     def load_widgets(self):
-        company_names,contact_names,outstanding = self.load()
+        company_names,contact_names,outstanding, total_outstanding, total_paid = self.load()
         self.widget_names = functools.reduce(operator.iconcat, [company_names, contact_names, str(outstanding)], [])
         self.widgets = []
         idx_numbers = list(range(0,len(company_names)))
 
+        piechart = DrawPieChart(total_paid,total_outstanding)
+        self.pie_view_layout.addWidget(piechart.draw_pie_chart(), 0,0, 5, 1)
+
         for idx_no, company_name, contact_name, rem_bal in list(zip(idx_numbers, company_names, contact_names, outstanding)):
             # TODO Load Widgets on a different thread
             item = MasterViewerWidget(idx_no, company_name, contact_name, rem_bal, database_filename=self.database_filename, ctx=self.ctx)#in the future, can reduce redundancy by only passing ctx and creating a function in Appctxt that reads database filename
-            self.controlsLayout.addWidget(item)
+            self.controlsLayout.addWidget(item, idx_no, 1, 1,2)
             self.widgets.append(item)
         
         spacer = QSpacerItem(1, 1, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -370,12 +447,13 @@ def run():
         # app = QApplication(sys.argv)
         # change font style globally
         try:
-            font = QFont("Verdana") # "Avenir" "Helvetica" "Proxima Nova" "Playfair Display" "Roboto" "Open Sans" "Montserrat" "SansSerif"
+            font = QFont("Calibri") # "Verdana" "Avenir" "Helvetica" "Proxima Nova" "Playfair Display" "Roboto" "Open Sans" "Montserrat" "SansSerif"
         # font.setStyleHint(QFont.Calibri)
         except:
-            font = QFont("Open Sans")
-        else:
-            font = QFont("Arial")
+            try:
+                font = QFont("Open Sans")
+            except:
+                font = QFont("Arial")
         appctxt.app.setFont(font)
         appctxt.app.setStyle("Fusion")
         # appctxt.app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))

@@ -27,5 +27,5 @@ class Tutorial(object):
         #     print("yes begin tutorial")
     
     def new_entry(self, parent):
-        text = "Enter"
-        inform_user(parent, text)
+        text = "Let's create a new customer for your company.\n"+"You can do this by clicking on 'Create New' button in top left.\n\n"+"Click 'Ok' to continue."
+        ans = inform_user(parent, text)

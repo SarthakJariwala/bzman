@@ -7,8 +7,8 @@
         "Phone No.": "",
         "Fax No.": "",
         "Total Business": 41000.0,
-        "Total Paid": 1300.0,
-        "Outstanding": 39700.0,
+        "Total Paid": 4300.0,
+        "Outstanding": 36700.0,
         "Details": "",
         "Invoices": {
             "Invoice 1": {
@@ -71,7 +71,7 @@
                 "Invoice No": "1234",
                 "P/O ref": "111",
                 "Invoice Amount": 40000.0,
-                "Outstanding": 39700.0,
+                "Outstanding": 36700.0,
                 "Issue Date": "Sat May 9 2020",
                 "Payments": {
                     "Payment 1": {
@@ -81,76 +81,10 @@
                         "Bank Name": "SBI",
                         "Cheque No": "XXXX",
                         "Remarks": ""
-                    }
-                }
-            }
-        },
-        "Logs": {},
-        "Price Quote Log": {}
-    },
-    {
-        "Company Name": "new",
-        "Contact Name": "new",
-        "Address": "",
-        "Email": "",
-        "Phone No.": "",
-        "Fax No.": "",
-        "Total Business": 1000.0,
-        "Total Paid": 1000.0,
-        "Outstanding": 0.0,
-        "Details": "",
-        "Invoices": {
-            "Invoice 1": {
-                "Invoice No": "12345",
-                "P/O ref": "12345",
-                "Amount": 1000.0,
-                "Issue Date": "Sat May 9 2020",
-                "Payments": {
-                    "Payment 1": {
-                        "Payment Date": "Sat May 9 2020",
-                        "Payment Amount": 100.0,
-                        "Payment Method": "Cash",
-                        "Remarks": "test payment"
                     },
                     "Payment 2": {
-                        "Payment Date": "Sat May 9 2020",
-                        "Payment Amount": 500.0,
-                        "Payment Method": "Cheque",
-                        "Remarks": "test cheque payment"
-                    },
-                    "Payment 3": {
-                        "Payment Date": "Sat May 9 2020",
-                        "Payment Amount": 100.0,
-                        "Payment Method": "Cheque",
-                        "Bank Name": "BOFA",
-                        "Cheque No": "XXX",
-                        "Remarks": "test cheque"
-                    }
-                }
-            },
-            "Invoice 2": {
-                "Invoice No": "9876",
-                "P/O ref": "9876",
-                "Amount": 1000.0,
-                "Issue Date": "Fri May 8 2020",
-                "Payments": {}
-            },
-            "Invoice 3": {
-                "Invoice No": "A1",
-                "P/O ref": "",
-                "Invoice Amount": 1000.0,
-                "Outstanding": 0.0,
-                "Issue Date": "Sat May 9 2020",
-                "Payments": {
-                    "Payment 1": {
-                        "Payment Date": "Sat May 9 2020",
-                        "Payment Amount": 500.0,
-                        "Payment Method": "Cash",
-                        "Remarks": ""
-                    },
-                    "Payment 2": {
-                        "Payment Date": "Sat May 9 2020",
-                        "Payment Amount": 500.0,
+                        "Payment Date": "Sun May 10 2020",
+                        "Payment Amount": 3000.0,
                         "Payment Method": "Cash",
                         "Remarks": ""
                     }
@@ -803,6 +737,86 @@
                         "Remarks": ""
                     }
                 }
+            }
+        },
+        "Logs": {},
+        "Price Quote Log": {}
+    },
+    {
+        "Company Name": "new LLC",
+        "Contact Name": "new",
+        "Address": "Mumbai, India",
+        "Email": "contact@new.com",
+        "Phone No.": "",
+        "Fax No.": "",
+        "Total Business": 11000.0,
+        "Total Paid": 1000.0,
+        "Outstanding": 10000.0,
+        "Details": "",
+        "Invoices": {
+            "Invoice 1": {
+                "Invoice No": "12345",
+                "P/O ref": "12345",
+                "Amount": 1000.0,
+                "Issue Date": "Sat May 9 2020",
+                "Payments": {
+                    "Payment 1": {
+                        "Payment Date": "Sat May 9 2020",
+                        "Payment Amount": 100.0,
+                        "Payment Method": "Cash",
+                        "Remarks": "test payment"
+                    },
+                    "Payment 2": {
+                        "Payment Date": "Sat May 9 2020",
+                        "Payment Amount": 500.0,
+                        "Payment Method": "Cheque",
+                        "Remarks": "test cheque payment"
+                    },
+                    "Payment 3": {
+                        "Payment Date": "Sat May 9 2020",
+                        "Payment Amount": 100.0,
+                        "Payment Method": "Cheque",
+                        "Bank Name": "BOFA",
+                        "Cheque No": "XXX",
+                        "Remarks": "test cheque"
+                    }
+                }
+            },
+            "Invoice 2": {
+                "Invoice No": "9876",
+                "P/O ref": "9876",
+                "Amount": 1000.0,
+                "Issue Date": "Fri May 8 2020",
+                "Payments": {}
+            },
+            "Invoice 3": {
+                "Invoice No": "A1",
+                "P/O ref": "",
+                "Invoice Amount": 1000.0,
+                "Outstanding": 0.0,
+                "Issue Date": "Sat May 9 2020",
+                "Payments": {
+                    "Payment 1": {
+                        "Payment Date": "Sat May 9 2020",
+                        "Payment Amount": 500.0,
+                        "Payment Method": "Cash",
+                        "Remarks": ""
+                    },
+                    "Payment 2": {
+                        "Payment Date": "Sat May 9 2020",
+                        "Payment Amount": 500.0,
+                        "Payment Method": "Cash",
+                        "Remarks": ""
+                    }
+                }
+            },
+            "Invoice 4": {
+                "Invoice No": "1234",
+                "P/O ref": "1234",
+                "Invoice Amount": 10000.0,
+                "Outstanding": 10000.0,
+                "Issue Date": "Sun May 10 2020",
+                "Payments": {}
             }
         },
         "Logs": {},

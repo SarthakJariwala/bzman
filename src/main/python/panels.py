@@ -317,12 +317,12 @@ class EntryPanel(QMainWindow):
 
         self.setCentralWidget(self.container)
 
-        self.setGeometry(1500, 100, 1000*self.devicePixelRatio(),800*self.devicePixelRatio())
-        self.setWindowTitle('Add New Entry')
+        self.setGeometry(800, 100, 1000*self.devicePixelRatio(),800*self.devicePixelRatio())
+        self.setWindowTitle('Create New Customer')
 
         # self.check_payment_method()# check correct option selection and enabling of lineedits
         # self.show()
-        self.centerOnScreen()
+        # self.centerOnScreen()
 
     def centerOnScreen (self):
         '''centerOnScreen() Centers the window on the screen.'''
