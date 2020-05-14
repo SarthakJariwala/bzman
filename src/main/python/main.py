@@ -8,7 +8,7 @@ from customwidgets import MasterViewerWidget
 from panels import EntryPanel
 from tutorial import Tutorial
 import qdarkstyle
-from util import read_file, write_file, ask_user, inform_user
+from util import read_file, write_file, ask_user, inform_user, TaskThread
 from charts import DrawPieChart
 import breeze_resources
 import functools
@@ -87,7 +87,26 @@ class WelcomeWindow(QMainWindow):
             # "Copyright &copy; JSS Inc.</p>"
         label = QLabel(text)
         label.setAlignment(Qt.AlignCenter)
-        self.setCentralWidget(label)
+
+        hbox = QHBoxLayout()
+        btn_new = QPushButton("   New   ")
+        btn_new.setMaximumSize(300,100)
+        btn_new.clicked.connect(self.new_file)
+        hbox.addWidget(btn_new)
+        btn_open = QPushButton("   Open   ")
+        btn_open.setMaximumSize(300,100)
+        btn_open.clicked.connect(self.load_file)
+        hbox.addWidget(btn_open)
+        hbox_widget = QWidget()
+        hbox_widget.setLayout(hbox)
+        
+        container = QWidget()
+        container_layout = QVBoxLayout()
+        container_layout.addWidget(label)
+        container_layout.addItem(QSpacerItem(10, 10, QSizePolicy.Expanding))
+        container_layout.addWidget(hbox_widget)
+        container.setLayout(container_layout)
+        self.setCentralWidget(container)
 
         toolbar = QToolBar("My Toolbar")
         toolbar.setIconSize(QSize(30,30))
@@ -181,22 +200,28 @@ class WelcomeWindow(QMainWindow):
         elif len(temp_list) == 0:
             ans = ask_user(self, "No Company Database found! \n\n" + "If you haven't created a company database yet, you can do it using 'New' option. Click 'Ok' to create a new database.\n\n"+
             "If you have already created a Database but moved it to a differenct location, please open it manually by clicking 'Cancel'.")
+            print(ans)
             if ans == QMessageBox.Ok:
                 self.new_file()
-            else:
+            elif ans == QMessageBox.Cancel:
                 filename = QFileDialog.getOpenFileName(self, "Open", filter="Database Files (*.json)")[0]
+            else: #4194304
+                pass
 
         else:
             filename = temp_list[0]
 
         if filename:
-            self.main_window = MainWindow(filename, self.ctx)
-            self.main_window.show()
-            self.setWindowState(Qt.WindowMinimized)
+            self._open_main_window(filename)
+    
+    def _open_main_window(self, filename):
+        self.main_window = MainWindow(filename, self.ctx)
+        self.main_window.show()
+        self.setWindowState(Qt.WindowMinimized)
     
     def new_file(self, called_from_tutorial = False):
         answer = ask_user(
-            self, "Is this your first time using BZMAN? \n"+ 
+            self, "Is this your first time using BZMAN? \n\n"+ 
             "If yes, would you like a guided tutorial to create your first entry? "+
             "Click 'Ok' for a guided tutorial.\n\nClick 'Cancel' to continue.")
         
@@ -306,11 +331,13 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
 
         # Adding Reload button
         self.reload_btn = QPushButton("Reload")
+        # self.reload_btn.setMaximumSize(700,100)
         self.reload_btn.setStyleSheet("QPushButton {background-color:#acdbdf; color:black;}")
         self.reload_btn.clicked.connect(self.reload_func)
 
         # Adding "Add" Button
         self.add_new_btn = QPushButton("Create New")
+        # self.add_new_btn.setMaximumSize(700,100)
         self.add_new_btn.setStyleSheet("QPushButton {background-color: #927fbf;color:black}")#7045af
         self.add_new_btn.clicked.connect(self.add_new_entry)
 

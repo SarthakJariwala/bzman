@@ -151,6 +151,14 @@ class InvoiceDialog(QDialog):
         self.inp_widgetsLayout = QVBoxLayout()
         self.item_1 = EntryWidget("Invoice Number:")
         self.inp_widgetsLayout.addWidget(self.item_1)
+
+        # Adding active invoices button
+        self.item_button = QPushButton("               Show Active Invoices               ")
+        # self.item_button.setMaximumSize(800,100)
+        self.item_button.setStyleSheet("QPushButton {color: '#DCDCDC'};")
+        self.inp_widgetsLayout.addWidget(self.item_button, alignment = Qt.AlignCenter)
+        self.item_button.setVisible(False)
+        
         self.item_2 = EntryWidget("Purchase Order Reference:")
         self.inp_widgetsLayout.addWidget(self.item_2)
         self.item_3 = EntrySpinBoxWidget("Amount:")
@@ -172,13 +180,16 @@ class InvoiceDialog(QDialog):
         self.layout = QGridLayout()
         self.layout.addWidget(self.inp_widgets, 0,0,4,1)
         self.layout.addWidget(self.payment_entry_widget, 0,1,1,1)
-        self.layout.addWidget(self.buttonBox, 5,1)
+        self.layout.addWidget(self.buttonBox, 5,0)
         self.setLayout(self.layout)
 
 class PaymentDialog(InvoiceDialog):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.layout.removeWidget(self.buttonBox)
+        self.layout.addWidget(self.buttonBox, 5,1)
+        self.item_button.setVisible(True)
         for w in [
             self.payment_entry_widget.payment_label,
             self.payment_entry_widget.radio_button1,
