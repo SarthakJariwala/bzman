@@ -97,7 +97,6 @@ class MasterViewerWidget(QWidget):
         payment.open_payment_dialog()
         
     def quick_summary(self):
-        print("Quick summary")
         paid, outstanding = get_company_summary(self.database_filename, self.idx_no)
         self.pie_chart = PieWindow(paid, outstanding)
         self.pie_chart.setWindowTitle("Quick Summary for "+str(self.company_name))

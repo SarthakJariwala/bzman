@@ -8,7 +8,7 @@ from customwidgets import MasterViewerWidget
 from panels import EntryPanel
 from tutorial import Tutorial
 import qdarkstyle
-from util import read_file, write_file, ask_user, inform_user, TaskThread
+from util import read_file, write_file, ask_user, inform_user
 from charts import DrawPieChart
 import breeze_resources
 import functools
@@ -200,7 +200,6 @@ class WelcomeWindow(QMainWindow):
         elif len(temp_list) == 0:
             ans = ask_user(self, "No Company Database found! \n\n" + "If you haven't created a company database yet, you can do it using 'New' option. Click 'Ok' to create a new database.\n\n"+
             "If you have already created a Database but moved it to a differenct location, please open it manually by clicking 'Cancel'.")
-            print(ans)
             if ans == QMessageBox.Ok:
                 self.new_file()
             elif ans == QMessageBox.Cancel:
