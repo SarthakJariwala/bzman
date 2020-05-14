@@ -505,8 +505,9 @@ class EditViewPanel(EntryPanel):
         # self.existing_invoice_no = []
         if len(data_pkl[int(self.idx_no)]["Invoices"]) > 0:
             for i in range(len(data_pkl[int(self.idx_no)]["Invoices"])):
-                item = QStandardItem(data_pkl[int(self.idx_no)]["Invoices"]["Invoice "+str(i+1)]["Invoice No"])
-                self.invoice_model.appendRow(item)
+                if data_pkl[int(self.idx_no)]["Invoices"]["Invoice "+str(i+1)]["Outstanding"] > 0:
+                    item = QStandardItem(data_pkl[int(self.idx_no)]["Invoices"]["Invoice "+str(i+1)]["Invoice No"])
+                    self.invoice_model.appendRow(item)
 
         return company_name, contact_name, address, email, phone_no, fax_no, total_business, total_paid, outstanding, details
     
