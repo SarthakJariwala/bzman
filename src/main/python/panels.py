@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import json
-from util import read_file, write_file, write_invoice_to_file, write_new_payment, inform_user
+from util import read_file, write_file, write_invoice_to_file, write_new_payment, inform_user, fill_widget
 
 # def inform_user(parent, text):
 #     QMessageBox.information(
@@ -257,8 +257,13 @@ class EntryPanel(QMainWindow):
         self.invoice_list_view = QListView()
         self.invoice_model = QStandardItemModel(self.invoice_list_view)
         self.invoice_list_view.setModel(self.invoice_model)
+        self.invoice_list_view.doubleClicked.connect(self._on_invoice_double_click)
+        self.invoice_log = None
         # self.invoice_list_view.setReadOnly(True)
-        # self.log_textEdit.setStyleSheet("QTextEdit {font-weight: bold;}")
+        self.show_all_invoice_checkbox = QCheckBox("All Invoices")
+        self.show_all_invoice_checkbox.setStatusTip("Show all invoices if checked, otherwise only oustanding invoices")
+        self.tab2Layout.addWidget(self.show_all_invoice_checkbox)
+        self.show_all_invoice_checkbox.setVisible(False)
         self.tab2Layout.addWidget(self.invoice_list_view)
 
         # Tab3
@@ -336,6 +341,26 @@ class EntryPanel(QMainWindow):
         resolution = QDesktopWidget().screenGeometry()
         self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                   (resolution.height() / 2) - (self.frameSize().height() / 2)) 
+    
+    @pyqtSlot(QModelIndex)
+    def _on_invoice_double_click(self, index):
+        self._temp_tree_widget = QTreeWidget()
+        if self.show_all_invoice_checkbox.isChecked():
+            fill_widget(self._temp_tree_widget, self._invoice_iterator()[0][index.row()])
+        else:
+            fill_widget(self._temp_tree_widget, self._invoice_iterator()[1][index.row()])
+        self._temp_tree_widget.setFixedSize(600*self.devicePixelRatio(),600*self.devicePixelRatio())
+        self._temp_tree_widget.show()
+    
+    def _invoice_iterator(self):
+        _temp_invoice_list = []
+        _temp_outstanding_invoice_list = []
+        if len(self.invoice_log) > 0:
+            for i in range(len(self.invoice_log)):
+                _temp_invoice_list.append(self.invoice_log["Invoice "+str(i+1)])
+                if self.invoice_log["Invoice "+str(i+1)]["Outstanding"] > 0:
+                    _temp_outstanding_invoice_list.append(self.invoice_log["Invoice "+str(i+1)])
+            return [_temp_invoice_list, _temp_outstanding_invoice_list]
 
     def open_invoice_dialog(self):
         new_invoice_dialog = InvoiceDialog(self)
@@ -358,7 +383,6 @@ class EntryPanel(QMainWindow):
         new_payment_dialog = PaymentDialog(self)
         new_payment_dialog.setWindowTitle("New Payment for "+ str(self.panel_entry[0].ledit.text()))
         ok = new_payment_dialog.exec_()
-        # TODO write if else statements
         if ok and new_payment_dialog.item_1.ledit.text() and new_payment_dialog.item_3.spin_box.value() != 0:
             if new_payment_dialog.payment_entry_widget.radio_button1.isChecked():
                 payment_method = new_payment_dialog.payment_entry_widget.radio_button1.text()
@@ -445,6 +469,8 @@ class EditViewPanel(EntryPanel):
 
         self.edit_checkbox.setVisible(True)
         self.edit_checkbox.stateChanged.connect(self.edit_or_view)
+        self.show_all_invoice_checkbox.setVisible(True)
+        self.show_all_invoice_checkbox.stateChanged.connect(self._check_invoice_checkbox_status)
         self.previous_data = self._get_data()
         self.populate_view(data=self.previous_data)
         if self.edit_true is True:
@@ -488,6 +514,21 @@ class EditViewPanel(EntryPanel):
                 except:
                     self.panel_entry[i].spin_box.setReadOnly(True)
     
+    def _check_invoice_checkbox_status(self):
+        self._fill_invoice_list_view()
+    
+    def _fill_invoice_list_view(self):
+        self.invoice_model.clear()
+        if len(self.invoice_log) > 0:
+            for i in range(len(self.invoice_log)):
+                if self.show_all_invoice_checkbox.isChecked():
+                    item = QStandardItem(self.invoice_log["Invoice "+str(i+1)]["Invoice No"])
+                    self.invoice_model.appendRow(item)
+                else:
+                    if self.invoice_log["Invoice "+str(i+1)]["Outstanding"] > 0:
+                        item = QStandardItem(self.invoice_log["Invoice "+str(i+1)]["Invoice No"])
+                        self.invoice_model.appendRow(item)
+    
     def _get_data(self):
         data_pkl = read_file(self.database_filename)
         company_name = data_pkl[int(self.idx_no)]["Company Name"]#.iloc[int(self.idx_no)]
@@ -501,13 +542,9 @@ class EditViewPanel(EntryPanel):
         outstanding = data_pkl[int(self.idx_no)]["Outstanding"]
         details = data_pkl[int(self.idx_no)]["Details"]
         self.prev_log = data_pkl[int(self.idx_no)]["Logs"]
+        self.invoice_log = data_pkl[int(self.idx_no)]["Invoices"]
         
-        # self.existing_invoice_no = []
-        if len(data_pkl[int(self.idx_no)]["Invoices"]) > 0:
-            for i in range(len(data_pkl[int(self.idx_no)]["Invoices"])):
-                if data_pkl[int(self.idx_no)]["Invoices"]["Invoice "+str(i+1)]["Outstanding"] > 0:
-                    item = QStandardItem(data_pkl[int(self.idx_no)]["Invoices"]["Invoice "+str(i+1)]["Invoice No"])
-                    self.invoice_model.appendRow(item)
+        self._fill_invoice_list_view()
 
         return company_name, contact_name, address, email, phone_no, fax_no, total_business, total_paid, outstanding, details
     
