@@ -220,7 +220,7 @@ class EntryPanel(QMainWindow):
         self.tab3Layout = QGridLayout()
         tabs.addTab(self.tab1, "Information")
         tabs.addTab(self.tab2, "Invoices")
-        tabs.addTab(self.tab3, "LOG")
+        tabs.addTab(self.tab3, "Details")
         
         # Tab1 # TODO: add QCompleter to the text entries
         item = EntryWidget("Company")#Company Name
@@ -247,7 +247,7 @@ class EntryPanel(QMainWindow):
         self.panel_entry.append(item)
         """Opening Balance here""" # TODO move this to after user saves info
         item = EntrySpinBoxWidget("Opening Balance")#"NEW Payment"
-        self.tab1Layout.addWidget(item,4,1)
+        # self.tab1Layout.addWidget(item,4,1)
         self.panel_entry.append(item)
         item = EntryTextEditWidget("Details") # Details
         item.tedit.setPlaceholderText("Add additional details here")
@@ -267,8 +267,9 @@ class EntryPanel(QMainWindow):
         self.tab2Layout.addWidget(self.invoice_list_view)
 
         # Tab3
-        self.log_textEdit = QTextEdit()
-        self.log_textEdit.setReadOnly(True)
+        self.log_textEdit = QTextEdit() #TODO Implement save method for this
+        self.log_textEdit.setPlaceholderText("Enter any customer details such as last conversation, last quote, etc. here")
+        # self.log_textEdit.setReadOnly(True)
         # self.log_textEdit.setStyleSheet("QTextEdit {font-weight: bold;}")
         self.tab3Layout.addWidget(self.log_textEdit)
 
