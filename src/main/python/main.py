@@ -183,6 +183,15 @@ class WelcomeWindow(QMainWindow):
         self.setWindowState(Qt.WindowMaximized)
         self.centerOnScreen()
 
+        self.BZMAN_settings = read_file(self.ctx.get_settings_file)
+        if self.BZMAN_settings['path'] != "":
+            self.load_file()
+        else:
+            self.show()
+            inform_user(
+                self, "Welcom to BZMAN! \n\n"+ 
+                "Click on the 'New' button to begin.")
+
     def centerOnScreen (self):
         '''centerOnScreen() Centers the window on the screen.'''
         resolution = QDesktopWidget().screenGeometry()
@@ -190,32 +199,40 @@ class WelcomeWindow(QMainWindow):
                   (resolution.height() / 2) - (self.frameSize().height() / 2)) 
     
     def load_file(self):
-        x = [os.path.abspath(f) for f in os.listdir() if os.path.isfile(f)]
-        temp_list =[]
-        filename = None
-        for i in range(len(x)):
-            if x[i].find("_BZMAN_DATABASE.json") != -1:
-                temp_list.append(x[i])
+
+        self.BZMAN_settings = read_file(self.ctx.get_settings_file)
+
+        if self.BZMAN_settings['path'] == "":
+            inform_user(self, "There is no database location or file. Please create a database using 'New'.")
         
-        if len(temp_list) >1:
-            inform_user(self, "There are more than one database files. Please select the one you want to open")
-            filename = QFileDialog.getOpenFileName(self, "Open", filter="Database Files (*.json)")[0]
-
-        elif len(temp_list) == 0:
-            ans = ask_user(self, "No Company Database found! \n\n" + "If you haven't created a company database yet, you can do it using 'New' option. Click 'Ok' to create a new database.\n\n"+
-            "If you have already created a Database but moved it to a differenct location, please open it manually by clicking 'Cancel'.")
-            if ans == QMessageBox.Ok:
-                self.new_file()
-            elif ans == QMessageBox.Cancel:
-                filename = QFileDialog.getOpenFileName(self, "Open", filter="Database Files (*.json)")[0]
-            else: #4194304
-                pass
-
         else:
-            filename = temp_list[0]
+            # x = [os.path.abspath(f) for f in os.listdir(self.BZMAN_settings['path']) if os.path.isfile(f)]
+            x = os.listdir(self.BZMAN_settings['path'])
+            temp_list =[]
+            filename = None
+            for i in range(len(x)):
+                if x[i].find("_BZMAN_DATABASE.json") != -1:
+                    temp_list.append(x[i])
+            
+            if len(temp_list) >1:
+                inform_user(self, "There are more than one database files. Please select the one you want to open")
+                filename = QFileDialog.getOpenFileName(self, "Open", self.BZMAN_settings['path'], filter="Database Files (*.json)")[0]
 
-        if filename:
-            self._open_main_window(filename)
+            elif len(temp_list) == 0:
+                ans = ask_user(self, "No Company Database found! \n\n" + "If you haven't created a company database yet, you can do it using 'New' option. Click 'Ok' to create a new database.\n\n"+
+                "If you have already created a Database but moved it to a differenct location, please open it manually by clicking 'Cancel'.")
+                if ans == QMessageBox.Ok:
+                    self.new_file()
+                elif ans == QMessageBox.Cancel:
+                    filename = QFileDialog.getOpenFileName(self, "Open", self.BZMAN_settings['path'], filter="Database Files (*.json)")[0]
+                else: #4194304
+                    pass
+
+            else:
+                filename = os.path.join(self.BZMAN_settings['path'] + '/' + temp_list[0])
+
+            if filename:
+                self._open_main_window(filename)
     
     def _open_main_window(self, filename):
         self.main_window = MainWindow(filename, self.ctx)
@@ -224,55 +241,83 @@ class WelcomeWindow(QMainWindow):
     
     def new_file(self, called_from_tutorial = False):
 
-        settings = read_file(self.ctx.get_settings_file)
+        self.BZMAN_settings = read_file(self.ctx.get_settings_file)
 
-        if settings["path"] == "":
+        if self.BZMAN_settings["path"] == "":
 
             inform_user(
                 self, "Welcom to BZMAN! \n\n"+ 
-                "Please select a folder to save your company database file.\n Click 'Ok' to continue.")
+                "Please select a folder to save your company database.")
 
-            folder_path = QFileDialog.getExistingDirectory(self, 'Select a folder to save your file')
+            self.folder_path = QFileDialog.getExistingDirectory(self, 'Select a folder to save your database')
             
-            if folder_path: #TODO subsection the following routine to another folder, handle else statements
+            if self.folder_path: #TODO subsection the following routine to another folder, handle else statements
                 
-                settings["path"] = folder_path
-
-                dlg =  QInputDialog(self)                 
-                dlg.setInputMode(QInputDialog.TextInput) 
-                dlg.setWindowTitle('New Database : Enter Your Company Name')
-                dlg.setLabelText('Company Name')                        
-                dlg.resize(800,100)                             
-                ok = dlg.exec_()                                
-                filename = dlg.textValue()
-  
-                if ok and filename:
-                    
-                    settings['company'] = filename
-                    
-                    filename = os.path.join(folder_path + "/" + filename)
-                    self.database_filename = filename+"_BZMAN_DATABASE.json"
-                    
-                    new_database = list()
-                    write_file(new_database, self.database_filename)
-                    write_file(settings, self.ctx.get_settings_file)
-                    
-                    ans = inform_user(self, "Great! Company database created!\n\n"+
-                    "In future, you may click on the 'Open' option to directly open this file.\n"+
-                    "Click 'Ok' to open it.")
-                    
-                    if ans == QMessageBox.Ok:
-                        
-                        self.load_file()
-                        ans = ask_user(self, "There are no entries in your company database.\n\n"+
-                        "You can now add a new customer by clicking on 'Create New Customer' option in the top left or by clicking 'Ok'.\n")
-                        
-                        if ans == QMessageBox.Ok:
-                            self.entry_panel = EntryPanel(self.database_filename, self.ctx)
-                            self.entry_panel.show() #move this after opening file
+                self.BZMAN_settings["path"] = self.folder_path
+                self._new_file_logic()
             
-                if ok and not filename:
-                    inform_user(self, "Company name was left blank. \nEnter a valid name.")
+            else:
+                inform_user(self, "No folder location selected.")
+        
+        else:
+            ans = ask_user(
+                self, 
+                "Company database already exists.\n\n"+
+                "Do you still want to create a new database?\n\n"
+            )
+
+            if ans == QMessageBox.Ok:
+                self.BZMAN_settings["path"] = ""
+                write_file(self.BZMAN_settings, self.ctx.get_settings_file)
+
+                inform_user(
+                    self,
+                    "Your old database will now need to be manually opened using 'Open'\n\n"+
+                    "You may now create a new database"
+                )
+                self.new_file()
+    
+    def _new_file_logic(self):
+        dlg =  QInputDialog(self)                 
+        dlg.setInputMode(QInputDialog.TextInput) 
+        dlg.setWindowTitle('New Database : Enter Your Company Name')
+        dlg.setLabelText('Company Name')                        
+        dlg.resize(800,100)                             
+        ok = dlg.exec_()                                
+        filename = dlg.textValue()
+
+        if ok and filename:
+            
+            self.BZMAN_settings['company'] = filename
+            self.BZMAN_settings['database_name'] = filename + "_BZMAN_DATABASE.json"
+            
+            filename = os.path.join(self.folder_path + "/" + filename)
+            self.database_filename = filename+"_BZMAN_DATABASE.json"
+            
+            new_database = list()
+            write_file(new_database, self.database_filename)
+            write_file(self.BZMAN_settings, self.ctx.get_settings_file)
+            
+            ans = inform_user(self, "Great! Company database created!\n\n"+
+            "Click 'Ok' to open it.")
+            
+            if ans == QMessageBox.Ok:
+                
+                self.load_file()
+                ans = ask_user(self, "There are no entries in your company database.\n\n"+
+                "You can now add a new customer by clicking on 'Create New Customer' option in the top left or by clicking 'Ok'.\n")
+                
+                if ans == QMessageBox.Ok:
+                    self.entry_panel = EntryPanel(self.database_filename, self.ctx)
+                    self.entry_panel.show() #move this after opening file
+        
+        elif ok and not filename:
+            inform_user(self, "Company name was left blank. \nEnter a valid name.")
+            self._new_file_logic()
+        
+        else:
+            self.BZMAN_settings["path"] = ""
+            write_file(self.BZMAN_settings, self.ctx.get_settings_file)
     
     def load_demo(self):
         self.main_window = MainWindow(self.ctx.get_demo_data, self.ctx)
@@ -392,7 +437,8 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
 
         # self.setGeometry(800, 100, 1500*self.devicePixelRatio(), 1500*self.devicePixelRatio())
         self.setWindowState(Qt.WindowMaximized)
-        self.setWindowTitle('BZMAN')
+        company_name = read_file(self.ctx.get_settings_file)['company']
+        self.setWindowTitle('BZMAN : ' + str(company_name) + " Database")
         self.centerOnScreen()
 
     def centerOnScreen (self):
