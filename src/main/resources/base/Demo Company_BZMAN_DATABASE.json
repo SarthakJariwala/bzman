@@ -1,0 +1,104 @@
+[
+    {
+        "Company Name": "My First Company",
+        "Contact Name": "My First Contact",
+        "Address": "CompanyVille, USA",
+        "Email": "contact@company.com",
+        "Phone No.": "987654321",
+        "Fax No.": "",
+        "Total Business": 10000.0,
+        "Total Paid": 200.0,
+        "Outstanding": 9800.0,
+        "Details": "Met through the contact at XYZ",
+        "Invoices": {
+            "Invoice 1": {
+                "Invoice No": "123456789",
+                "P/O ref": "abcd",
+                "Invoice Amount": 10000.0,
+                "Outstanding": 9800.0,
+                "Issue Date": "Wed May 20 2020",
+                "Payments": {
+                    "Payment 1": {
+                        "Payment Date": "Wed May 20 2020",
+                        "Payment Amount": 200.0,
+                        "Payment Method": "Cheque",
+                        "Bank Name": "SBI",
+                        "Cheque No": "XXXXX",
+                        "Remarks": "Paid on time"
+                    }
+                }
+            }
+        },
+        "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2000 for ABCD stack - told them this is the lowest we will go"
+    },
+    {
+        "Company Name": "My Second Company",
+        "Contact Name": "My Second Contact",
+        "Address": "CompanyVille, USA",
+        "Email": "contact@company.com",
+        "Phone No.": "987654321",
+        "Fax No.": "",
+        "Total Business": 10000.0,
+        "Total Paid": 3200.0,
+        "Outstanding": 6800.0,
+        "Details": "Met through the contact at XYZ",
+        "Invoices": {
+            "Invoice 1": {
+                "Invoice No": "123456789",
+                "P/O ref": "abcd",
+                "Invoice Amount": 10000.0,
+                "Outstanding": 6800.0,
+                "Issue Date": "Wed May 20 2020",
+                "Payments": {
+                    "Payment 1": {
+                        "Payment Date": "Wed May 20 2020",
+                        "Payment Amount": 200.0,
+                        "Payment Method": "Cheque",
+                        "Bank Name": "SBI",
+                        "Cheque No": "XXXXX",
+                        "Remarks": "Paid on time"
+                    },
+                    "Payment 2": {
+                        "Payment Date": "Wed May 20 2020",
+                        "Payment Amount": 3000.0,
+                        "Payment Method": "Cash",
+                        "Remarks": "Delivered by Mr. XYZ"
+                    }
+                }
+            }
+        },
+        "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2500 for ABCD stack - told them this is the lowest we will go"
+    },
+    {
+        "Company Name": "My Third Company",
+        "Contact Name": "My Third Contact",
+        "Address": "CompanyVille, USA",
+        "Email": "contact@company.com",
+        "Phone No.": "987654321",
+        "Fax No.": "",
+        "Total Business": 10000.0,
+        "Total Paid": 200.0,
+        "Outstanding": 9800.0,
+        "Details": "Met through the contact at XYZ",
+        "Invoices": {
+            "Invoice 1": {
+                "Invoice No": "123456789",
+                "P/O ref": "abcd",
+                "Invoice Amount": 10000.0,
+                "Outstanding": 9800.0,
+                "Issue Date": "Wed May 20 2020",
+                "Payments": {
+                    "Payment 1": {
+                        "Payment Date": "Wed May 20 2020",
+                        "Payment Amount": 200.0,
+                        "Payment Method": "Cheque",
+                        "Bank Name": "SBI",
+                        "Cheque No": "XXXXX",
+                        "Remarks": "Paid on time"
+                    }
+                }
+            }
+        },
+        "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2000 for ABCD stack - told them this is the lowest we will go"
+    }
+]
