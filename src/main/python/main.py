@@ -38,7 +38,7 @@ class AppContext(ApplicationContext):
     
     @cached_property
     def get_demo_data(self):
-        return self.get_resource('Company_database.json')
+        return self.get_resource('Demo Company_BZMAN_DATABASE.json')
 
     @cached_property
     def get_breeze_dark(self):
@@ -77,9 +77,6 @@ class WelcomeWindow(QMainWindow):
 
         self.setWindowTitle("Welcome to BZMAN!")
 
-        # label = QLabel("Welcome to Tuition Manager!\nCreate or Load a File")
-        # label.setAlignment(Qt.AlignCenter)
-        # label.setPixmap(QPixmap("logo.png"))
         text = "<center>" \
             "<br><br><h1></h1>" \
             "&#8291;" \
@@ -146,11 +143,6 @@ class WelcomeWindow(QMainWindow):
         font = QAction("Fonts", self)
         font.triggered.connect(self.font_choice)
 
-        # Tutorial actions
-        # tu_add_new_entry_acc = QAction("Create or Add New", self)
-        # tu_add_new_entry_acc.triggered.connect(self.tu_add_new_entry)
-        # tu_edit_entry_acc = QAction("Edit Entry", self)
-
         self.setStatusBar(QStatusBar(self))
 
         menu = self.menuBar()
@@ -163,11 +155,6 @@ class WelcomeWindow(QMainWindow):
         file_menu.addAction(new_action)
         file_menu.addAction(load_action)
         file_menu.addAction(load_demo)
-
-        # tutorial = menu.addMenu("Tutorial")
-        # tutorial.setFont(menu_font_size)
-        # tutorial.addAction(tu_add_new_entry_acc)
-        # tutorial.addAction(tu_edit_entry_acc)
 
         options = menu.addMenu("&Customize")
         options.setFont(menu_font_size)
@@ -251,7 +238,7 @@ class WelcomeWindow(QMainWindow):
 
             self.folder_path = QFileDialog.getExistingDirectory(self, 'Select a folder to save your database')
             
-            if self.folder_path: #TODO subsection the following routine to another folder, handle else statements
+            if self.folder_path:
                 
                 self.BZMAN_settings["path"] = self.folder_path
                 self._new_file_logic()
@@ -322,6 +309,7 @@ class WelcomeWindow(QMainWindow):
     def load_demo(self):
         self.main_window = MainWindow(self.ctx.get_demo_data, self.ctx)
         self.main_window.show()
+        self.main_window.setWindowTitle("BZMAN : Demo Company Database")
         self.setWindowState(Qt.WindowMinimized)
     
     def change_theme(self):
@@ -347,18 +335,6 @@ class WelcomeWindow(QMainWindow):
         font, valid = QFontDialog.getFont()
         if valid:
             self.ctx.app.setFont(font)
-    
-    # def tu_create_new_file(self): #FIXME needs fixing due to new changes to new_file function
-    #     self.tu = Tutorial()
-    #     ans = self.tu.start_tutorial(parent = self)
-
-    #     if ans and QMessageBox.Ok:
-    #         print("yes inside tutorial")
-    #         # self.new_file()
-            
-    # def tu_add_new_entry(self):
-    #     self.tu = Tutorial()
-    #     self.tu.new_entry(parent=self)
 
 
 class MainWindow(QMainWindow): #TODO add file menu with different options here too
