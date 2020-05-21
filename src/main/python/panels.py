@@ -350,7 +350,7 @@ class EntryPanel(QMainWindow):
             fill_widget(self._temp_tree_widget, self._invoice_iterator()[0][index.row()])
         else:
             fill_widget(self._temp_tree_widget, self._invoice_iterator()[1][index.row()])
-        self._temp_tree_widget.setFixedSize(600*self.devicePixelRatio(),600*self.devicePixelRatio())
+        self._temp_tree_widget.setMinimumSize(600*self.devicePixelRatio(),600*self.devicePixelRatio())
         self._temp_tree_widget.show()
     
     def _invoice_iterator(self):
