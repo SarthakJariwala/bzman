@@ -101,17 +101,14 @@ class PaymentWidget(QWidget):
         # self.payment_widget = QWidget()
         self.payment_layout = QGridLayout()
         self.payment_label = QLabel("Payment Method")
-        # payment_label.setStyleSheet("QLabel {font-weight: bold;}")
         self.payment_layout.addWidget(self.payment_label,0,0,1,2)
         self.payment_radio_setup = QWidget() # Cash/cheque widget
         payment_method_layout = QHBoxLayout()
         self.radio_button1 = QRadioButton("Cash")
-        # self.radio_button1.setStyleSheet("QRadioButton {font-weight: bold;}")
         self.radio_button1.setChecked(True)
         self.radio_button1.toggled.connect(self.check_payment_method)
         payment_method_layout.addWidget(self.radio_button1)
         self.radio_button2 = QRadioButton("Cheque")
-        # self.radio_button2.setStyleSheet("QRadioButton {font-weight: bold;}")
         self.radio_button2.toggled.connect(self.check_payment_method)
         payment_method_layout.addWidget(self.radio_button2)
         self.payment_radio_setup.setLayout(payment_method_layout)
@@ -267,11 +264,10 @@ class EntryPanel(QMainWindow):
         self.tab2Layout.addWidget(self.invoice_list_view)
 
         # Tab3
-        self.log_textEdit = QTextEdit() #TODO Implement save method for this
-        self.log_textEdit.setPlaceholderText("Enter any customer details such as last conversation, last quote, etc. here")
-        # self.log_textEdit.setReadOnly(True)
-        # self.log_textEdit.setStyleSheet("QTextEdit {font-weight: bold;}")
-        self.tab3Layout.addWidget(self.log_textEdit)
+        self.extra_details_textEdit = QTextEdit() #TODO Implement save method for this
+        self.extra_details_textEdit.setPlaceholderText("Enter any customer details such as last conversation, last quote, etc. here")
+        # self.extra_details_textEdit.setReadOnly(True)
+        self.tab3Layout.addWidget(self.extra_details_textEdit)
 
         #Set Layout for tabs
         self.tab1.setLayout(self.tab1Layout)
@@ -332,16 +328,6 @@ class EntryPanel(QMainWindow):
 
         self.setGeometry(800, 100, 1000*self.devicePixelRatio(),800*self.devicePixelRatio())
         self.setWindowTitle('Create New Customer')
-
-        # self.check_payment_method()# check correct option selection and enabling of lineedits
-        # self.show()
-        # self.centerOnScreen()
-
-    def centerOnScreen (self):
-        '''centerOnScreen() Centers the window on the screen.'''
-        resolution = QDesktopWidget().screenGeometry()
-        self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
-                  (resolution.height() / 2) - (self.frameSize().height() / 2)) 
     
     @pyqtSlot(QModelIndex)
     def _on_invoice_double_click(self, index):
@@ -412,7 +398,7 @@ class EntryPanel(QMainWindow):
             inform_user(self, "No invoice number entered. Ener a valid invoice number")
             self.open_payment_dialog()
     
-    def _collect_widget_data(self):# TODO collect Log entries while editing and reading file
+    def _collect_widget_data(self):
        company_name = self.panel_entry[0].ledit.text()
        contact_name =  self.panel_entry[1].ledit.text()
        address = self.panel_entry[2].tedit.toPlainText()
@@ -423,9 +409,12 @@ class EntryPanel(QMainWindow):
        total_paid = 0
        outstanding = 0
        details = self.panel_entry[7].tedit.toPlainText()
+
+       extra_details_textEdit = self.extra_details_textEdit.toPlainText()
     #    # Read in database file to write in
        data_pkl = read_file(self.database_filename)
        self.idx_no = len(data_pkl) # for setting invoice through entry panel, otherwise there is no reference of index no in entry panel
+       
        data_dict={
            "Company Name": company_name, "Contact Name": contact_name,
            "Address": address, 
@@ -433,8 +422,8 @@ class EntryPanel(QMainWindow):
            "Total Business": total_business, "Total Paid": total_paid, 
            "Outstanding": outstanding,"Details": details,
            "Invoices":{},
-           "Logs":{},
-           "Price Quote Log":{}
+        #    "Logs":{},
+           "Price Quote Log": extra_details_textEdit
            }
        data_pkl.append(data_dict)
        return data_pkl
@@ -448,7 +437,6 @@ class EntryPanel(QMainWindow):
         
         if answer and QMessageBox.Ok:
             self.open_invoice_dialog()
-        # data_pkl.to_csv(self.database_filename, index = False)#, sheet_name="Sheet1")
         self.statusBar.showMessage("Entry Added!", 2000)
         for i in range(len(self.panel_entry)):
             try:
@@ -465,7 +453,7 @@ class EditViewPanel(EntryPanel):
     def __init__(self, idx_no, edit_true = True, *args, **kwargs):#Order of arguments "name,std,school" etc must be the same everywhere!
         self.idx_no = idx_no
         self.edit_true = edit_true
-        self.prev_log = {}
+        # self.prev_log = {}
         super().__init__(*args, **kwargs)
 
         self.edit_checkbox.setVisible(True)
@@ -478,7 +466,7 @@ class EditViewPanel(EntryPanel):
             self.edit_checkbox.setChecked(True)
         else:
             self.edit_checkbox.setChecked(False)
-        # self.undo_btn.clicked.connect(self.undo_changes)
+        self.undo_btn.clicked.connect(self.undo_changes)
         
         self.setWindowTitle('View/Edit Panel')
         # self.show()
@@ -538,19 +526,18 @@ class EditViewPanel(EntryPanel):
         email = data_pkl[int(self.idx_no)]["Email"]
         phone_no = data_pkl[int(self.idx_no)]["Phone No."]
         fax_no = data_pkl[int(self.idx_no)]["Fax No."]
-        total_business = data_pkl[int(self.idx_no)]["Total Business"]
-        total_paid = data_pkl[int(self.idx_no)]["Total Paid"]
-        outstanding = data_pkl[int(self.idx_no)]["Outstanding"]
         details = data_pkl[int(self.idx_no)]["Details"]
-        self.prev_log = data_pkl[int(self.idx_no)]["Logs"]
+        # self.prev_log = data_pkl[int(self.idx_no)]["Logs"]
         self.invoice_log = data_pkl[int(self.idx_no)]["Invoices"]
+
+        extra_details_textEdit = data_pkl[int(self.idx_no)]["Price Quote Log"]
         
         self._fill_invoice_list_view()
 
-        return company_name, contact_name, address, email, phone_no, fax_no, total_business, total_paid, outstanding, details
+        return company_name, contact_name, address, email, phone_no, fax_no, details, extra_details_textEdit
     
     def populate_view(self, data):
-        company_name, contact_name, address, email, phone_no, fax_no, total_business, total_paid, outstanding, details = data
+        company_name, contact_name, address, email, phone_no, fax_no, details, extra_details_textEdit = data
     
         self.panel_entry[0].ledit.setText(str(company_name))
         self.panel_entry[1].ledit.setText(str(contact_name))
@@ -560,9 +547,7 @@ class EditViewPanel(EntryPanel):
         self.panel_entry[5].ledit.setText(str(fax_no))
         self.panel_entry[7].tedit.setText(str(details))
 
-        # self.panel_entry[3].spin_box.setValue(float(fees_ann))
-        # self.panel_entry[4].spin_box.setValue(float(fees_paid))
-        # self.panel_entry[5].spin_box.setValue(float(fees_rem))
+        self.extra_details_textEdit.setText(str(extra_details_textEdit))
         # self.set_log_text()
         self.edit_or_view()
 
@@ -630,10 +615,9 @@ class EditViewPanel(EntryPanel):
        email =  self.panel_entry[3].ledit.text()
        phone_no = self.panel_entry[4].ledit.text()
        fax_no = self.panel_entry[5].ledit.text()
-       total_business = 0#float(self.panel_entry[3].spin_box.value())
-       total_paid = 0#float(self.panel_entry[4].spin_box.value())
-       outstanding = 0#float(self.panel_entry[5].spin_box.value())
        details = self.panel_entry[7].tedit.toPlainText()
+
+       extra_details_textEdit = self.extra_details_textEdit.toPlainText()
 
        data_pkl = read_file(self.database_filename)
     #    prev_balance = data_pkl[int(self.idx_no)]["Remaining"]
@@ -644,10 +628,9 @@ class EditViewPanel(EntryPanel):
        data_pkl[int(self.idx_no)]["Email"] = email
        data_pkl[int(self.idx_no)]["Phone No."] =  phone_no
        data_pkl[int(self.idx_no)]["Fax No."] =  fax_no
-    #    data_pkl[int(self.idx_no)]["Total Balance"] = fees_ann
-    #    data_pkl[int(self.idx_no)]["Paid"] = fees_paid
-    #    data_pkl[int(self.idx_no)]["Remaining"] =  fees_rem
        data_pkl[int(self.idx_no)]["Details"] =  details
+
+       data_pkl[int(self.idx_no)]["Price Quote Log"] = extra_details_textEdit
        
     #    if prev_balance != fees_rem: # only log payments if there has been a change in the balance
     #        new_log = {}
