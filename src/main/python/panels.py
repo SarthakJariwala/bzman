@@ -347,9 +347,11 @@ class EntryPanel(QMainWindow):
             float(new_invoice_dialog.item_3.spin_box.value()),
             str(new_invoice_dialog.item_4.calendar.selectedDate().toString())
             )
+            self.reload()
         elif ok and not new_invoice_dialog.item_1.ledit.text() and new_invoice_dialog.item_3.spin_box.value() == 0:
             inform_user(self, "Invoice field was left empty or Amount was 0.\n\n"+
                 "No new invoice was created.")
+            self.open_invoice_dialog()
     
     def open_payment_dialog(self):
         new_payment_dialog = PaymentDialog(self)
@@ -375,6 +377,7 @@ class EntryPanel(QMainWindow):
             str(new_payment_dialog.item_4.calendar.selectedDate().toString()),
             payment_method, bank_name, cheque_no, remarks            
             )
+            self.reload()
         elif ok and new_payment_dialog.item_3.spin_box.value() == 0:
             inform_user(self, "Payment amount was '0'. Ener a valid payment amount")
             self.open_payment_dialog()
@@ -437,6 +440,9 @@ class EntryPanel(QMainWindow):
                         self.panel_entry[i].tedit.setText("")
                 except:
                     self.panel_entry[i].spin_box.setValue(0.00)
+    
+    def reload(self):
+        pass # implemented in inherited Edit/View panel
                     
 class EditViewPanel(EntryPanel):
 
@@ -630,8 +636,8 @@ class EditViewPanel(EntryPanel):
         
     def reload(self):
         self.populate_view(self._get_data())
-        inform_user(self, "Entry updated. You may now reload.")
-        self.close()
+        inform_user(self, "Entry updated. You may now reload using 'Reload' option.")
+        # self.close()
 
     def undo_changes(self):
         self.populate_view(self.previous_data)# set it to previous data # TODO : should take care of details text edit too
