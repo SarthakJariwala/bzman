@@ -100,5 +100,19 @@
             }
         },
         "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2000 for ABCD stack - told them this is the lowest we will go"
+    },
+    {
+        "Company Name": "My Fourth Company",
+        "Contact Name": "My Fourth Conatact",
+        "Address": "CompanyVille, USA",
+        "Email": "contact@company.com",
+        "Phone No.": "",
+        "Fax No.": "",
+        "Total Business": 0,
+        "Total Paid": 0,
+        "Outstanding": 0,
+        "Details": "",
+        "Invoices": {},
+        "Price Quote Log": ""
     }
 ]
