@@ -597,18 +597,37 @@ class EditViewPanel(EntryPanel):
     #             else:
     #                 self.log_str += indent + ">"+ """<b> {}</b><br/>""".format(print_string)
 
-    def collect_widget_data(self):
+    def _collect_widget_data(self):
         company_name = self.panel_entry[0].ledit.text()
+        contact_name =  self.panel_entry[1].ledit.text()
+        address = self.panel_entry[2].tedit.toPlainText()
+        email =  self.panel_entry[3].ledit.text()
+        phone_no = self.panel_entry[4].ledit.text()
+        fax_no = self.panel_entry[5].ledit.text()
+        details = self.panel_entry[7].tedit.toPlainText()
+
+        extra_details_textEdit = self.extra_details_textEdit.toPlainText()
+
+        self.new_data = company_name, contact_name, address, email, phone_no, fax_no, details, extra_details_textEdit
+
+            # data_pkl = read_file(self.database_filename)
+
+            # data_pkl[int(self.idx_no)]["Company Name"] = company_name
+            # data_pkl[int(self.idx_no)]["Contact Name"] = contact_name
+            # data_pkl[int(self.idx_no)]["Address"] = address
+            # data_pkl[int(self.idx_no)]["Email"] = email
+            # data_pkl[int(self.idx_no)]["Phone No."] =  phone_no
+            # data_pkl[int(self.idx_no)]["Fax No."] =  fax_no
+            # data_pkl[int(self.idx_no)]["Details"] =  details
+
+            # data_pkl[int(self.idx_no)]["Price Quote Log"] = extra_details_textEdit
+
+            # return data_pkl
+    
+    def _replace_data(self):
+        company_name, contact_name, address, email, phone_no, fax_no, details, extra_details_textEdit = self.new_data
+
         if company_name != "":
-            contact_name =  self.panel_entry[1].ledit.text()
-            address = self.panel_entry[2].tedit.toPlainText()
-            email =  self.panel_entry[3].ledit.text()
-            phone_no = self.panel_entry[4].ledit.text()
-            fax_no = self.panel_entry[5].ledit.text()
-            details = self.panel_entry[7].tedit.toPlainText()
-
-            extra_details_textEdit = self.extra_details_textEdit.toPlainText()
-
             data_pkl = read_file(self.database_filename)
 
             data_pkl[int(self.idx_no)]["Company Name"] = company_name
@@ -628,16 +647,34 @@ class EditViewPanel(EntryPanel):
             return None
 
     def update_database(self):
-        data_pkl = self.collect_widget_data()
+        self._collect_widget_data()
+        data_pkl = self._replace_data()
         if data_pkl is not None:
             write_file(data_pkl,self.database_filename)
             self.statusBar.showMessage("Edited & Saved!", 2000)
             self.reload()
         
     def reload(self):
-        self.populate_view(self._get_data())
+        # Set 'new' previous_data after reload, populate widgets and then collect widget data to set 'new_data'
+        # This will set previous_data equal to new_data after reload
+        self.previous_data = self._get_data()
+        self.populate_view(data=self.previous_data)
+        self._collect_widget_data()
         inform_user(self, "Entry updated. You may now reload using 'Reload' option.")
         # self.close()
 
     def undo_changes(self):
         self.populate_view(self.previous_data)# set it to previous data # TODO : should take care of details text edit too
+    
+    def closeEvent(self, e):# reimplement QMainWindow closeEvent
+        self._collect_widget_data()
+        if self.previous_data != self.new_data:
+            ans = QMessageBox.question(
+                self, None, "You have unsaved changes for this company. Do you want to save before closing?",
+                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+
+            if ans == QMessageBox.Save:
+                self.update_database()
+            
+            elif ans == QMessageBox.Cancel:
+                e.ignore()
