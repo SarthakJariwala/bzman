@@ -139,9 +139,11 @@ def fill_item(item, value):
             child = QTreeWidgetItem()
             child.setText(0, key)
             if key == "Invoice No":
-                child.setForeground(0, QColor("#acdbdf"))
+                child.setForeground(0, QColor("#927fbf"))
             if key == "Outstanding":
                 child.setForeground(0, QColor("#ff4866"))
+            if key == "Payments":
+                child.setForeground(0, QColor("#4ecca3"))
             if key == "Payment Amount":
                 child.setForeground(0, QColor("#4ecca3"))
 
@@ -171,7 +173,7 @@ def fill_item(item, value):
     font.bold()
     font.setStyleHint(QFont.Courier)
     item.setFont(0, font)
-    child.setFont(0, font)
+    # child.setFont(0, font)
 
 def fill_widget(widget, value):
 #   widget.clear()
