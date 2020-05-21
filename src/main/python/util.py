@@ -1,5 +1,7 @@
 import json
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from time import time
 
 def inform_user(parent, text):
@@ -94,15 +96,8 @@ def write_new_payment(
             invoice_amount = data_pkl[int(index)]["Invoices"]["Invoice "+str(invoice_index+1)]["Invoice Amount"]
             payments = data_pkl[int(index)]["Invoices"]["Invoice "+str(invoice_index+1)]["Payments"]
             invoice_outstanding = data_pkl[int(index)]["Invoices"]["Invoice "+str(invoice_index+1)]["Outstanding"]
-            # if len(payments)>0:
-            #     prev_payments = []
-            #     for i in range(len(payments)):
-            #         prev_payments.append(payments["Payment "+str(i+1)]["Payment Amount"])
-            #     prev_payments = sum(prev_payments)
-            # else:
-            #     prev_payments = 0
 
-            if invoice_outstanding - amount >=0:# <= invoice_amount:
+            if invoice_outstanding - amount >=0:
                 new_payment = {}
                 new_payment["Payment Date"] = date
                 new_payment["Payment Amount"] = amount
@@ -136,30 +131,47 @@ def write_new_payment(
 
 # to populate a QTreeWidget
 def fill_item(item, value):
-  item.setExpanded(True)
-  if isinstance(value,dict):
-    for key, val in value.items():
-      child = QTreeWidgetItem()
-      child.setText(0, key)
-      item.addChild(child)
-      fill_item(child, val)
-  elif isinstance(value,list):
-    for val in value:
-      child = QTreeWidgetItem()
-      item.addChild(child)
-      if isinstance(value,dict):      
-        child.setText(0, '[dict]')
-        fill_item(child, val)
-      elif isinstance(value,list):
-        child.setText(0, '[list]')
-        fill_item(child, val)
-      else:
-        child.setText(0, val)              
-      child.setExpanded(True)
-  else:
-    child = QTreeWidgetItem()
-    child.setText(0, str(value))
-    item.addChild(child)
+    
+    item.setExpanded(True)
+    
+    if isinstance(value,dict):
+        for key, val in value.items():
+            child = QTreeWidgetItem()
+            child.setText(0, key)
+            if key == "Invoice No":
+                child.setForeground(0, QColor("#acdbdf"))
+            if key == "Outstanding":
+                child.setForeground(0, QColor("#ff4866"))
+            if key == "Payment Amount":
+                child.setForeground(0, QColor("#4ecca3"))
+
+            item.addChild(child)
+            fill_item(child, val)
+    
+    elif isinstance(value,list):
+        for val in value:
+            child = QTreeWidgetItem()
+            item.addChild(child)
+            if isinstance(value,dict):      
+                child.setText(0, '[dict]')
+                fill_item(child, val)
+            elif isinstance(value,list):
+                child.setText(0, '[list]')
+                fill_item(child, val)
+            else:
+                child.setText(0, val)              
+                child.setExpanded(True)
+    else:
+        child = QTreeWidgetItem()
+        child.setText(0, str(value))
+        item.addChild(child)
+    
+    font = QFont()
+    font.setPointSize(10)
+    font.bold()
+    font.setStyleHint(QFont.Courier)
+    item.setFont(0, font)
+    child.setFont(0, font)
 
 def fill_widget(widget, value):
 #   widget.clear()
