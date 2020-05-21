@@ -137,20 +137,20 @@ def write_new_payment(
 # to populate a QTreeWidget
 def fill_item(item, value):
   item.setExpanded(True)
-  if type(value) is dict:
+  if isinstance(value,dict):
     for key, val in value.items():
       child = QTreeWidgetItem()
       child.setText(0, key)
       item.addChild(child)
       fill_item(child, val)
-  elif type(value) is list:
+  elif isinstance(value,list):
     for val in value:
       child = QTreeWidgetItem()
       item.addChild(child)
-      if type(val) is dict:      
+      if isinstance(value,dict):      
         child.setText(0, '[dict]')
         fill_item(child, val)
-      elif type(val) is list:
+      elif isinstance(value,list):
         child.setText(0, '[list]')
         fill_item(child, val)
       else:
