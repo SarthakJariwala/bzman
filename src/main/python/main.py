@@ -6,7 +6,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from customwidgets import MasterViewerWidget 
 from panels import EntryPanel
-from tutorial import Tutorial
 import qdarkstyle
 from util import read_file, write_file, ask_user, inform_user
 from charts import DrawPieChart
