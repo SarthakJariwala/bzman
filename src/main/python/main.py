@@ -369,7 +369,7 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         self.searchbar.setCompleter(self.completer)
 
         # Adding Reload button
-        self.reload_btn = QPushButton("Reload")
+        self.reload_btn = QPushButton("Reload") # TODO add a quick action (Ctrl+R (?))
         # self.reload_btn.setMaximumSize(700,100)
         self.reload_btn.setStyleSheet("QPushButton {background-color:#acdbdf; color:black;}")
         self.reload_btn.clicked.connect(self.reload_func)
