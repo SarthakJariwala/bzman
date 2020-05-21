@@ -419,9 +419,9 @@ class EntryPanel(QMainWindow):
        email =  self.panel_entry[3].ledit.text()
        phone_no = self.panel_entry[4].ledit.text()
        fax_no = self.panel_entry[5].ledit.text()
-       total_business = 0#float(self.panel_entry[3].spin_box.value())
-       total_paid = 0#float(self.panel_entry[4].spin_box.value())
-       outstanding = 0#float(self.panel_entry[5].spin_box.value())
+       total_business = 0
+       total_paid = 0
+       outstanding = 0
        details = self.panel_entry[7].tedit.toPlainText()
     #    # Read in database file to write in
        data_pkl = read_file(self.database_filename)
