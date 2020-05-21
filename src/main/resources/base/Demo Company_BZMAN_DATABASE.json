@@ -6,9 +6,9 @@
         "Email": "contact@company.com",
         "Phone No.": "987654321",
         "Fax No.": "",
-        "Total Business": 10000.0,
+        "Total Business": 11500.0,
         "Total Paid": 200.0,
-        "Outstanding": 9800.0,
+        "Outstanding": 11300.0,
         "Details": "Met through the contact at XYZ",
         "Invoices": {
             "Invoice 1": {
@@ -27,6 +27,14 @@
                         "Remarks": "Paid on time"
                     }
                 }
+            },
+            "Invoice 2": {
+                "Invoice No": "987654321",
+                "P/O ref": "qwerty",
+                "Invoice Amount": 1500.0,
+                "Outstanding": 1500.0,
+                "Issue Date": "Thu May 21 2020",
+                "Payments": {}
             }
         },
         "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2000 for ABCD stack - told them this is the lowest we will go"
@@ -76,9 +84,9 @@
         "Email": "contact@company.com",
         "Phone No.": "987654321",
         "Fax No.": "",
-        "Total Business": 10000.0,
+        "Total Business": 12000.0,
         "Total Paid": 200.0,
-        "Outstanding": 9800.0,
+        "Outstanding": 11800.0,
         "Details": "Met through the contact at XYZ",
         "Invoices": {
             "Invoice 1": {
@@ -97,6 +105,14 @@
                         "Remarks": "Paid on time"
                     }
                 }
+            },
+            "Invoice 2": {
+                "Invoice No": "987654321",
+                "P/O ref": "qwerty",
+                "Invoice Amount": 2000.0,
+                "Outstanding": 2000.0,
+                "Issue Date": "Thu May 21 2020",
+                "Payments": {}
             }
         },
         "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2000 for ABCD stack - told them this is the lowest we will go"
