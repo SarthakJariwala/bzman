@@ -2,13 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import json
-from util import read_file, write_file, write_invoice_to_file, write_new_payment, inform_user, fill_widget
-
-# def inform_user(parent, text):
-#     QMessageBox.information(
-#         parent, None, text,
-#         QMessageBox.Ok
-#     )
+from util import read_file, write_file, write_invoice_to_file, write_new_payment, inform_user, ask_user, fill_widget
 
 class EntryWidget(QWidget):
 
@@ -18,9 +12,7 @@ class EntryWidget(QWidget):
         self.name = name
 
         self.lbl = QLabel(self.name)
-        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.ledit = QLineEdit()
-        # self.ledit.setStyleSheet("QLineEdit {font-weight: bold;}")
 
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.lbl)
@@ -35,9 +27,7 @@ class EntryComboBox(QWidget):
         self.name = name
 
         self.lbl = QLabel(self.name)
-        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.comboBox = QComboBox()
-        # self.ledit.setStyleSheet("QLineEdit {font-weight: bold;}")
 
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.lbl)
@@ -52,9 +42,7 @@ class EntryTextEditWidget(QWidget):
         self.name = name
 
         self.lbl = QLabel(self.name)
-        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.tedit = QTextEdit()
-        # self.tedit.setStyleSheet("QTextEdit {font-weight: bold;}")
 
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.lbl)
@@ -69,7 +57,6 @@ class EntrySpinBoxWidget(QWidget):
         self.name = name
 
         self.lbl = QLabel(self.name)
-        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.spin_box = QDoubleSpinBox()
         self.spin_box.setStyleSheet("QDoubleSpinBox {font-weight: bold;}")
         self.spin_box.setMaximum(1000000000000000.00)
@@ -86,9 +73,7 @@ class EntryCalendarWidget(QWidget):
         
         self.name = name
         self.lbl = QLabel(self.name)
-        # self.lbl.setStyleSheet("QLabel {font-weight: bold;}")
         self.calendar = QCalendarWidget()
-        # self.spin_box.setStyleSheet("QCalendarWidget {font-weight: bold;}")
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.lbl)
         self.vbox1.addWidget(self.calendar)
@@ -264,7 +249,7 @@ class EntryPanel(QMainWindow):
         self.tab2Layout.addWidget(self.invoice_list_view)
 
         # Tab3
-        self.extra_details_textEdit = QTextEdit() #TODO Implement save method for this
+        self.extra_details_textEdit = QTextEdit()
         self.extra_details_textEdit.setPlaceholderText("Enter any customer details such as last conversation, last quote, etc. here")
         # self.extra_details_textEdit.setReadOnly(True)
         self.tab3Layout.addWidget(self.extra_details_textEdit)
@@ -399,61 +384,65 @@ class EntryPanel(QMainWindow):
             self.open_payment_dialog()
     
     def _collect_widget_data(self):
-       company_name = self.panel_entry[0].ledit.text()
-       contact_name =  self.panel_entry[1].ledit.text()
-       address = self.panel_entry[2].tedit.toPlainText()
-       email =  self.panel_entry[3].ledit.text()
-       phone_no = self.panel_entry[4].ledit.text()
-       fax_no = self.panel_entry[5].ledit.text()
-       total_business = 0
-       total_paid = 0
-       outstanding = 0
-       details = self.panel_entry[7].tedit.toPlainText()
+        company_name = self.panel_entry[0].ledit.text()
+        if company_name != "":
+            contact_name =  self.panel_entry[1].ledit.text()
+            address = self.panel_entry[2].tedit.toPlainText()
+            email =  self.panel_entry[3].ledit.text()
+            phone_no = self.panel_entry[4].ledit.text()
+            fax_no = self.panel_entry[5].ledit.text()
+            total_business = 0
+            total_paid = 0
+            outstanding = 0
+            details = self.panel_entry[7].tedit.toPlainText()
 
-       extra_details_textEdit = self.extra_details_textEdit.toPlainText()
-    #    # Read in database file to write in
-       data_pkl = read_file(self.database_filename)
-       self.idx_no = len(data_pkl) # for setting invoice through entry panel, otherwise there is no reference of index no in entry panel
-       
-       data_dict={
-           "Company Name": company_name, "Contact Name": contact_name,
-           "Address": address, 
-           "Email": email, "Phone No.": phone_no, "Fax No.": fax_no,
-           "Total Business": total_business, "Total Paid": total_paid, 
-           "Outstanding": outstanding,"Details": details,
-           "Invoices":{},
-        #    "Logs":{},
-           "Price Quote Log": extra_details_textEdit
-           }
-       data_pkl.append(data_dict)
-       return data_pkl
+            extra_details_textEdit = self.extra_details_textEdit.toPlainText()
+            #    # Read in database file to write in
+            data_pkl = read_file(self.database_filename)
+            self.idx_no = len(data_pkl) # for setting invoice through entry panel, otherwise there is no reference of index no in entry panel
+            
+            data_dict={
+                "Company Name": company_name, "Contact Name": contact_name,
+                "Address": address, 
+                "Email": email, "Phone No.": phone_no, "Fax No.": fax_no,
+                "Total Business": total_business, "Total Paid": total_paid, 
+                "Outstanding": outstanding,"Details": details,
+                "Invoices":{},
+                "Price Quote Log": extra_details_textEdit
+                }
+            data_pkl.append(data_dict)
+            return data_pkl
+        
+        else: #return None if company_name is left blank
+            inform_user(self, "Please enter a company name.")
+            return None
 
     def update_database(self): #TODO: Catch user entering empty strings
         data_pkl = self._collect_widget_data()
-        write_file(data_pkl, self.database_filename)
-        answer = QMessageBox.question(
-            self, None, "Do you want to create an opening balance for this company?", 
-            QMessageBox.Ok | QMessageBox.Cancel)
-        
-        if answer and QMessageBox.Ok:
-            self.open_invoice_dialog()
-        self.statusBar.showMessage("Entry Added!", 2000)
-        for i in range(len(self.panel_entry)):
-            try:
+        if data_pkl is not None:
+            write_file(data_pkl, self.database_filename)
+            answer = ask_user(
+                self, "You can now add invoices for this company.\n\n"+
+                "Do you want to start the account for this company by adding an invoice?\n\n", 
+            )
+            
+            if answer == QMessageBox.Ok:
+                self.open_invoice_dialog()
+            self.statusBar.showMessage("Entry Added!", 2000)
+            for i in range(len(self.panel_entry)):
                 try:
-                    self.panel_entry[i].ledit.setText("")
+                    try:
+                        self.panel_entry[i].ledit.setText("")
+                    except:
+                        self.panel_entry[i].tedit.setText("")
                 except:
-                    self.panel_entry[i].tedit.setText("")
-            except:
-                self.panel_entry[i].spin_box.setValue(0.00)
-                # self.statusBar.clearMessage()# only to remove any message that comes while resetting spinboxes (due to their connections)
-    
+                    self.panel_entry[i].spin_box.setValue(0.00)
+                    
 class EditViewPanel(EntryPanel):
 
     def __init__(self, idx_no, edit_true = True, *args, **kwargs):#Order of arguments "name,std,school" etc must be the same everywhere!
         self.idx_no = idx_no
         self.edit_true = edit_true
-        # self.prev_log = {}
         super().__init__(*args, **kwargs)
 
         self.edit_checkbox.setVisible(True)
@@ -469,7 +458,6 @@ class EditViewPanel(EntryPanel):
         self.undo_btn.clicked.connect(self.undo_changes)
         
         self.setWindowTitle('View/Edit Panel')
-        # self.show()
     
     def edit_or_view(self):
         if self.edit_checkbox.isChecked():
@@ -477,8 +465,6 @@ class EditViewPanel(EntryPanel):
             self.new_payment_btn.setVisible(True)
             self.save_btn.setVisible(True)
             self.undo_btn.setVisible(True)
-            # self.payment_radio_setup.setEnabled(True)
-            # self.check_payment_method()
             for i in range(len(self.panel_entry)):
                 try:
                     try:
@@ -492,8 +478,6 @@ class EditViewPanel(EntryPanel):
             self.new_payment_btn.setVisible(False)
             self.save_btn.setVisible(False)
             self.undo_btn.setVisible(False)
-            # self.payment_radio_setup.setEnabled(False)
-            # self.check_payment_method()
             for i in range(len(self.panel_entry)):
                 try:
                     try:
@@ -527,7 +511,6 @@ class EditViewPanel(EntryPanel):
         phone_no = data_pkl[int(self.idx_no)]["Phone No."]
         fax_no = data_pkl[int(self.idx_no)]["Fax No."]
         details = data_pkl[int(self.idx_no)]["Details"]
-        # self.prev_log = data_pkl[int(self.idx_no)]["Logs"]
         self.invoice_log = data_pkl[int(self.idx_no)]["Invoices"]
 
         extra_details_textEdit = data_pkl[int(self.idx_no)]["Price Quote Log"]
@@ -551,7 +534,7 @@ class EditViewPanel(EntryPanel):
         # self.set_log_text()
         self.edit_or_view()
 
-    # def set_log_text(self):#, x=None): # TODO save a separate log file to keep track of everything
+    # def set_log_text(self):#, x=None):
     #     # if x is not None:
     #     # #     self.search_text = x.lower()
     #     # old_scroll_pos = self.log_textEdit.verticalScrollBar().value()
@@ -609,52 +592,41 @@ class EditViewPanel(EntryPanel):
     #                 self.log_str += indent + ">"+ """<b> {}</b><br/>""".format(print_string)
 
     def collect_widget_data(self):
-       company_name = self.panel_entry[0].ledit.text()
-       contact_name =  self.panel_entry[1].ledit.text()
-       address = self.panel_entry[2].tedit.toPlainText()
-       email =  self.panel_entry[3].ledit.text()
-       phone_no = self.panel_entry[4].ledit.text()
-       fax_no = self.panel_entry[5].ledit.text()
-       details = self.panel_entry[7].tedit.toPlainText()
+        company_name = self.panel_entry[0].ledit.text()
+        if company_name != "":
+            contact_name =  self.panel_entry[1].ledit.text()
+            address = self.panel_entry[2].tedit.toPlainText()
+            email =  self.panel_entry[3].ledit.text()
+            phone_no = self.panel_entry[4].ledit.text()
+            fax_no = self.panel_entry[5].ledit.text()
+            details = self.panel_entry[7].tedit.toPlainText()
 
-       extra_details_textEdit = self.extra_details_textEdit.toPlainText()
+            extra_details_textEdit = self.extra_details_textEdit.toPlainText()
 
-       data_pkl = read_file(self.database_filename)
-    #    prev_balance = data_pkl[int(self.idx_no)]["Remaining"]
+            data_pkl = read_file(self.database_filename)
 
-       data_pkl[int(self.idx_no)]["Company Name"] = company_name
-       data_pkl[int(self.idx_no)]["Contact Name"] = contact_name
-       data_pkl[int(self.idx_no)]["Address"] = address
-       data_pkl[int(self.idx_no)]["Email"] = email
-       data_pkl[int(self.idx_no)]["Phone No."] =  phone_no
-       data_pkl[int(self.idx_no)]["Fax No."] =  fax_no
-       data_pkl[int(self.idx_no)]["Details"] =  details
+            data_pkl[int(self.idx_no)]["Company Name"] = company_name
+            data_pkl[int(self.idx_no)]["Contact Name"] = contact_name
+            data_pkl[int(self.idx_no)]["Address"] = address
+            data_pkl[int(self.idx_no)]["Email"] = email
+            data_pkl[int(self.idx_no)]["Phone No."] =  phone_no
+            data_pkl[int(self.idx_no)]["Fax No."] =  fax_no
+            data_pkl[int(self.idx_no)]["Details"] =  details
 
-       data_pkl[int(self.idx_no)]["Price Quote Log"] = extra_details_textEdit
-       
-    #    if prev_balance != fees_rem: # only log payments if there has been a change in the balance
-    #        new_log = {}
-    #        new_log["Record Date"] = date.today().strftime("%B %d, %Y")
-    #        new_log["Opening Balance"] = prev_balance
-    #        new_log["Closing Balance"] = fees_rem
-    #        new_log["Payment Amount"] = payment
-    #        if self.radio_button1.isChecked():
-    #            new_log["Payment Method"] = self.radio_button1.text()
-    #        if self.radio_button2.isChecked():
-    #            new_log["Payment Method"] = self.radio_button2.text()
-    #            new_log["Details"] = {}
-    #            new_log["Details"]['Bank Name'] = self.panel_entry[7].ledit.text()
-    #            new_log["Details"]['Cheque Number'] = self.panel_entry[8].ledit.text()
+            data_pkl[int(self.idx_no)]["Price Quote Log"] = extra_details_textEdit
 
-    #        data_pkl[int(self.idx_no)]["Logs"]["Log"+str(len(data_pkl[int(self.idx_no)]["Logs"])+1)] = new_log
-       return data_pkl
+            return data_pkl
+        
+        else: #return None if company_name is left blank
+            inform_user(self, "Please enter a company name.")
+            return None
 
     def update_database(self):
         data_pkl = self.collect_widget_data()
-        # self.panel_entry[9].spin_box.setValue(0.00)#set payment spinbox to 0 after saving
-        write_file(data_pkl,self.database_filename)
-        self.statusBar.showMessage("Edited & Saved!", 2000)
-        self.reload()
+        if data_pkl is not None:
+            write_file(data_pkl,self.database_filename)
+            self.statusBar.showMessage("Edited & Saved!", 2000)
+            self.reload()
         
     def reload(self):
         self.populate_view(self._get_data())
@@ -663,4 +635,3 @@ class EditViewPanel(EntryPanel):
 
     def undo_changes(self):
         self.populate_view(self.previous_data)# set it to previous data # TODO : should take care of details text edit too
-        # self.panel_entry[9].spin_box.setValue(0.00)#set payment spinbox to 0 after saving
