@@ -81,7 +81,7 @@ class WelcomeWindow(QMainWindow):
         # label.setAlignment(Qt.AlignCenter)
         # label.setPixmap(QPixmap("logo.png"))
         text = "<center>" \
-            "<h1></h1>" \
+            "<br><br><h1></h1>" \
             "&#8291;" \
             "<img src=%r>" \
             "</center>" \
@@ -112,23 +112,23 @@ class WelcomeWindow(QMainWindow):
         container.setLayout(container_layout)
         self.setCentralWidget(container)
 
-        toolbar = QToolBar("My Toolbar")
-        toolbar.setIconSize(QSize(30,30))
-        self.addToolBar(toolbar)
+        # toolbar = QToolBar("My Toolbar")
+        # toolbar.setIconSize(QSize(30,30))
+        # self.addToolBar(toolbar)
 
         new_action = QAction("New", self)
         new_action.setStatusTip("Create a new file")
         new_action.triggered.connect(self.new_file)
         new_action.setShortcut(QKeySequence.New)
-        toolbar.addAction(new_action)
+        # toolbar.addAction(new_action)
         
-        toolbar.addSeparator()
+        # toolbar.addSeparator()
 
         load_action = QAction("Open", self)
         load_action.setStatusTip("Open an existing file")
         load_action.triggered.connect(self.load_file)
         load_action.setShortcut(QKeySequence.Open)
-        toolbar.addAction(load_action)
+        # toolbar.addAction(load_action)
 
         load_demo = QAction("Open Demo", self)
         load_demo.setStatusTip("Open demo file")
@@ -147,9 +147,9 @@ class WelcomeWindow(QMainWindow):
         font.triggered.connect(self.font_choice)
 
         # Tutorial actions
-        tu_add_new_entry_acc = QAction("Create or Add New", self)
-        tu_add_new_entry_acc.triggered.connect(self.tu_add_new_entry)
-        tu_edit_entry_acc = QAction("Edit Entry", self)
+        # tu_add_new_entry_acc = QAction("Create or Add New", self)
+        # tu_add_new_entry_acc.triggered.connect(self.tu_add_new_entry)
+        # tu_edit_entry_acc = QAction("Edit Entry", self)
 
         self.setStatusBar(QStatusBar(self))
 
@@ -164,10 +164,10 @@ class WelcomeWindow(QMainWindow):
         file_menu.addAction(load_action)
         file_menu.addAction(load_demo)
 
-        tutorial = menu.addMenu("Tutorial")
-        tutorial.setFont(menu_font_size)
-        tutorial.addAction(tu_add_new_entry_acc)
-        tutorial.addAction(tu_edit_entry_acc)
+        # tutorial = menu.addMenu("Tutorial")
+        # tutorial.setFont(menu_font_size)
+        # tutorial.addAction(tu_add_new_entry_acc)
+        # tutorial.addAction(tu_edit_entry_acc)
 
         options = menu.addMenu("&Customize")
         options.setFont(menu_font_size)
@@ -348,17 +348,17 @@ class WelcomeWindow(QMainWindow):
         if valid:
             self.ctx.app.setFont(font)
     
-    def tu_create_new_file(self): #FIXME needs fixing due to new changes to new_file function
-        self.tu = Tutorial()
-        ans = self.tu.start_tutorial(parent = self)
+    # def tu_create_new_file(self): #FIXME needs fixing due to new changes to new_file function
+    #     self.tu = Tutorial()
+    #     ans = self.tu.start_tutorial(parent = self)
 
-        if ans and QMessageBox.Ok:
-            print("yes inside tutorial")
-            # self.new_file()
+    #     if ans and QMessageBox.Ok:
+    #         print("yes inside tutorial")
+    #         # self.new_file()
             
-    def tu_add_new_entry(self):
-        self.tu = Tutorial()
-        self.tu.new_entry(parent=self)
+    # def tu_add_new_entry(self):
+    #     self.tu = Tutorial()
+    #     self.tu.new_entry(parent=self)
 
 
 class MainWindow(QMainWindow): #TODO add file menu with different options here too
