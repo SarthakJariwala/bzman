@@ -90,7 +90,7 @@ def write_new_payment(
                 parent,
                 "Invoice number doesn't exist. Enter a valid invoice number.\n\n"+
                 "If this is a new invoice, use the 'New Invoice' option."
-            )
+            ) # return None here to 
         else:
             invoice_index = existing_invoice_no.index(invoice_no)
             invoice_amount = data_pkl[int(index)]["Invoices"]["Invoice "+str(invoice_index+1)]["Invoice Amount"]
@@ -121,6 +121,7 @@ def write_new_payment(
                 data_pkl[int(index)]["Total Paid"] = prev_paid + amount
                 
                 write_file(data_pkl,filename)
+                return True
             
             elif invoice_outstanding == 0:
                 inform_user(parent, "There are no outstanding payments for this invoice.")
@@ -128,6 +129,7 @@ def write_new_payment(
             else:
                 inform_user(parent, "Amount you entered ("+str(amount)+") is greater than remaining amount ("+
                 str(invoice_outstanding)+ ") for this invoice.")
+                return 3 # FIXME - this is a temp return assignment
 
 # to populate a QTreeWidget
 def fill_item(item, value):

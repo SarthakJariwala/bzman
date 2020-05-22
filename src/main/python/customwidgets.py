@@ -40,12 +40,14 @@ class MasterViewerWidget(QWidget):
         # Adding Quick add ToolButton
         new_invoice_action = QAction("New Invoice", self)
         record_payment_action = QAction("New Payment", self)
+        view_active_invoices = QAction("View Active Invoices", self)
         quick_summ_action = QAction("Quick Summary", self)
         self.quick_add = QToolButton()
         self.quick_add.setIcon(QIcon(QPixmap(self.ctx.get_plus_sign)))
         # self.quick_add.setMenu(menu)
         self.quick_add.addAction(new_invoice_action)
         self.quick_add.addAction(record_payment_action)
+        self.quick_add.addAction(view_active_invoices)
         self.quick_add.addAction(quick_summ_action)
         self.quick_add.setPopupMode(QToolButton.InstantPopup)
         self.quick_add.setIconSize(QSize(75, 75))
@@ -82,6 +84,7 @@ class MasterViewerWidget(QWidget):
         self.btn_delete.clicked.connect(self.delete_entry)
         new_invoice_action.triggered.connect(self.new_invoice)
         record_payment_action.triggered.connect(self.new_payment)
+        view_active_invoices.triggered.connect(self.view_active_invoices)
         quick_summ_action.triggered.connect(self.quick_summary)
         
         self.setLayout(self.hbox3)
@@ -95,6 +98,10 @@ class MasterViewerWidget(QWidget):
     def new_payment(self):
         payment = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
         payment.open_payment_dialog()
+    
+    def view_active_invoices(self):
+        view_active_invoices = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
+        view_active_invoices.show_active_invoices_frm_payment(called_from_payment=False)
         
     def quick_summary(self):
         paid, outstanding = get_company_summary(self.database_filename, self.idx_no)

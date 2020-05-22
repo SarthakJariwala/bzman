@@ -181,6 +181,20 @@ class PaymentDialog(InvoiceDialog):
             self.payment_entry_widget.remarks]:
             w.setVisible(True)
 
+class InvoiceListDialog(QDialog):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._invoice_list_view = QListView()
+        self._invoice_model = QStandardItemModel(self._invoice_list_view)
+        self._invoice_list_view.setModel(self._invoice_model)
+
+        self.layout = QGridLayout()
+        self.layout.addWidget(self._invoice_list_view)
+        self.setLayout(self.layout)
+        self.setWindowTitle("Active Invoices")
+
 class EntryPanel(QMainWindow):
 
     def __init__(self, database_filename, ctx, *args, **kwargs):
@@ -332,7 +346,7 @@ class EntryPanel(QMainWindow):
                 _temp_invoice_list.append(self.invoice_log["Invoice "+str(i+1)])
                 if self.invoice_log["Invoice "+str(i+1)]["Outstanding"] > 0:
                     _temp_outstanding_invoice_list.append(self.invoice_log["Invoice "+str(i+1)])
-            return [_temp_invoice_list, _temp_outstanding_invoice_list]
+            return [_temp_invoice_list, _temp_outstanding_invoice_list] # [dict, dict]
 
     def open_invoice_dialog(self):
         new_invoice_dialog = InvoiceDialog(self)
@@ -356,6 +370,7 @@ class EntryPanel(QMainWindow):
     def open_payment_dialog(self):
         new_payment_dialog = PaymentDialog(self)
         new_payment_dialog.setWindowTitle("New Payment for "+ str(self.panel_entry[0].ledit.text()))
+        new_payment_dialog.item_button.clicked.connect(lambda : self.show_active_invoices_frm_payment(True))
         ok = new_payment_dialog.exec_()
         if ok and new_payment_dialog.item_1.ledit.text() and new_payment_dialog.item_3.spin_box.value() != 0:
             if new_payment_dialog.payment_entry_widget.radio_button1.isChecked():
@@ -369,7 +384,7 @@ class EntryPanel(QMainWindow):
             
             remarks = new_payment_dialog.payment_entry_widget.remarks.tedit.toPlainText()
             
-            write_new_payment(self, self.database_filename,
+            success = write_new_payment(self, self.database_filename,
             self.idx_no,
             str(new_payment_dialog.item_1.ledit.text()),
             str(new_payment_dialog.item_2.ledit.text()),
@@ -377,7 +392,10 @@ class EntryPanel(QMainWindow):
             str(new_payment_dialog.item_4.calendar.selectedDate().toString()),
             payment_method, bank_name, cheque_no, remarks            
             )
-            self.reload()
+            if success is True:
+                self.reload()
+            if success == 3:
+                self.open_payment_dialog()
         elif ok and new_payment_dialog.item_3.spin_box.value() == 0:
             inform_user(self, "Payment amount was '0'. Ener a valid payment amount")
             self.open_payment_dialog()
@@ -385,6 +403,25 @@ class EntryPanel(QMainWindow):
         elif ok and not new_payment_dialog.item_1.ledit.text():
             inform_user(self, "No invoice number entered. Ener a valid invoice number")
             self.open_payment_dialog()
+    
+    def show_active_invoices_frm_payment(self, called_from_payment=True):
+        active_invoice_list = InvoiceListDialog(self)
+        # BUG TODO when called from exec_, can't scroll or in child widgets like tree widget
+        active_invoice_list._invoice_list_view.doubleClicked.connect(self._on_invoice_double_click)
+        try:
+            if len(self._invoice_iterator()[1]) > 0:
+                for i in range(len(self._invoice_iterator()[1])):
+                    item = QStandardItem(self._invoice_iterator()[1][i]["Invoice No"])
+                    active_invoice_list._invoice_model.appendRow(item)
+                if called_from_payment == False:
+                    active_invoice_list.exec_()
+                else:
+                    # TODO open this widget to the side of the active dialog, instead of in the centre of it
+                    active_invoice_list.show()
+        except TypeError:
+            inform_user(self, "No active invoices for ")
+        else:
+            pass
     
     def _collect_widget_data(self):
         company_name = self.panel_entry[0].ledit.text()
