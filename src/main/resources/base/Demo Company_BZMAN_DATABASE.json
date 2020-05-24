@@ -7,8 +7,8 @@
         "Phone No.": "987654321",
         "Fax No.": "",
         "Total Business": 11500.0,
-        "Total Paid": 200.0,
-        "Outstanding": 11300.0,
+        "Total Paid": 1200.0,
+        "Outstanding": 10300.0,
         "Details": "Met through the contact at XYZ",
         "Invoices": {
             "Invoice 1": {
@@ -32,12 +32,19 @@
                 "Invoice No": "987654321",
                 "P/O ref": "qwerty",
                 "Invoice Amount": 1500.0,
-                "Outstanding": 1500.0,
+                "Outstanding": 500.0,
                 "Issue Date": "Thu May 21 2020",
-                "Payments": {}
+                "Payments": {
+                    "Payment 1": {
+                        "Payment Date": "Sat May 23 2020",
+                        "Payment Amount": 1000.0,
+                        "Payment Method": "Cash",
+                        "Remarks": ""
+                    }
+                }
             }
         },
-        "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2000 for ABCD stack - told them this is the lowest we will go"
+        "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2000 for ABCD stack - told them this is the lowest we will go. discount 20%"
     },
     {
         "Company Name": "My Second Company",
