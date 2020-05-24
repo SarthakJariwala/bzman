@@ -132,6 +132,10 @@ class WelcomeWindow(QMainWindow):
         load_demo.setStatusTip("Open demo file")
         load_demo.triggered.connect(self.load_demo)
 
+        set_new_file_path = QAction("Set New Path", self)
+        set_new_file_path.setStatusTip("Sets a new path for an existing file")
+        set_new_file_path.triggered.connect(self.set_new_file_location)
+
         dark_theme = QAction("Dark", self)
         dark_theme.triggered.connect(self.change_theme)
         breeze_dark = QAction("Breeze Dark", self)
@@ -156,6 +160,7 @@ class WelcomeWindow(QMainWindow):
         file_menu.addAction(new_action)
         file_menu.addAction(load_action)
         file_menu.addAction(load_demo)
+        file_menu.addAction(set_new_file_path)
 
         options = menu.addMenu("&Customize")
         options.setFont(menu_font_size)
@@ -187,14 +192,13 @@ class WelcomeWindow(QMainWindow):
                   (resolution.height() / 2) - (self.frameSize().height() / 2)) 
     
     def load_file(self):
-        #TODO add a set_folder_location option to set file/folder location incase user moves everything to a new path
-
+    
         self.BZMAN_settings = read_file(self.ctx.get_settings_file)
 
         if self.BZMAN_settings['path'] == "":
-            inform_user(self, "There is no database location specified.\n"+
-            "If you have recently moved the file to a new location, use the 'set_folder_path' to set the new file location\n\n"+
-            "If you haven't created a database, create a new database using 'New'") #TODO add a set_folder_location option to set file/folder location incase user moves everything to a new path
+            inform_user(self, "There is no database location specified.\n\n"+ "If you haven't created a database, create a new database using 'New'\n\n"+
+            "If you have recently moved the file to a new location, use the 'Set New Path' option in File menu to set the new file location"
+            )
         
         else:
             # x = [os.path.abspath(f) for f in os.listdir(self.BZMAN_settings['path']) if os.path.isfile(f)]
@@ -216,6 +220,17 @@ class WelcomeWindow(QMainWindow):
                     self.new_file()
                 elif ans == QMessageBox.Cancel:
                     filename = QFileDialog.getOpenFileName(self, "Open", self.BZMAN_settings['path'], filter="Database Files (*.json)")[0]
+                    if filename:
+                        ans = ask_user(self, "Do you want to save this file location for future use? This will overwrite your existing path where the file wasn't found.")
+
+                        if ans == QMessageBox.Ok:
+                            new_path, new_filename = os.path.split(filename)
+                            new_company_name = " ".join(os.path.split(os.path.splitext(filename)[0])[1].split('_')[:-2])
+                            self.BZMAN_settings['path'] = new_path
+                            self.BZMAN_settings['database_name'] = new_filename
+                            self.BZMAN_settings['company'] = new_company_name
+                            write_file(self.BZMAN_settings, self.ctx.get_settings_file)
+
                 else: #4194304
                     pass
 
@@ -316,6 +331,24 @@ class WelcomeWindow(QMainWindow):
         self.main_window.setWindowTitle("BZMAN : Demo Company Database")
         self.setWindowState(Qt.WindowMinimized)
     
+    def set_new_file_location(self):
+        ans = ask_user(self, "This will let 'B Z M A N' set a new path to your exisiting company database. "+
+        "This means you will be able to open files that you have moved to a new location after saving them.\n\n"+ 
+        "If you want to continue, click 'Ok'. If you want to exit, click 'Cancel'.")
+        
+        if ans == QMessageBox.Ok:
+            filename = QFileDialog.getOpenFileName(self, "Open", self.BZMAN_settings['path'], filter="Database Files (*.json)")[0]
+            if filename:
+                new_path, new_filename = os.path.split(filename)
+                new_company_name = ",".join(os.path.split(os.path.splitext(filename)[0])[1].split('_')[:-2])
+                self.BZMAN_settings['path'] = new_path
+                self.BZMAN_settings['database_name'] = new_filename
+                self.BZMAN_settings['company'] = new_company_name
+                write_file(self.BZMAN_settings, self.ctx.get_settings_file)
+                inform_user(self, "New path to the company database has been set. You can now open the database using 'Open'")
+
+            else:
+                inform_user(self, "Select a valid database file")
     def change_theme(self):
         self.ctx.app.setPalette(self.ctx.dark_palette())
         self.ctx.app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
