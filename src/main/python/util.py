@@ -68,7 +68,7 @@ def write_invoice_to_file(parent, filename, index, invoice_no, po_no, amount, da
         write_file(data_pkl,filename)
 
 def write_new_payment(
-    parent, filename, index, invoice_no, po_no,amount, date, 
+    parent, filename, index, invoice_no, amount, date, 
     payment_method, bank_name, cheque_no, remarks):
     
     data_pkl = read_file(filename)
@@ -85,7 +85,7 @@ def write_new_payment(
         for i in range(len(data_pkl[int(index)]["Invoices"])):
             existing_invoice_no.append(data_pkl[int(index)]["Invoices"]["Invoice "+str(i+1)]["Invoice No"])
     
-        if invoice_no not in existing_invoice_no:
+        if invoice_no not in existing_invoice_no: #with combobox in payment dialog this becomes pointless TODO remove this check
             inform_user(
                 parent,
                 "Invoice number doesn't exist. Enter a valid invoice number.\n\n"+
@@ -126,7 +126,7 @@ def write_new_payment(
             elif invoice_outstanding == 0:
                 inform_user(parent, "There are no outstanding payments for this invoice.")
             
-            else:
+            else: #TODO check amount entered dynamically as the user is entering in payment dialog
                 inform_user(parent, "Amount you entered ("+str(amount)+") is greater than remaining amount ("+
                 str(invoice_outstanding)+ ") for this invoice.")
                 return 3 # FIXME - this is a temp return assignment

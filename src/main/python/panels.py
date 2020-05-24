@@ -131,15 +131,13 @@ class InvoiceDialog(QDialog):
 
         self.inp_widgets = QWidget()
         self.inp_widgetsLayout = QVBoxLayout()
+
+        self.item_0 = EntryComboBox("Invoice Number:")
+        self.inp_widgetsLayout.addWidget(self.item_0)
+        self.item_0.setVisible(False)
+
         self.item_1 = EntryWidget("Invoice Number:")
         self.inp_widgetsLayout.addWidget(self.item_1)
-
-        # Adding active invoices button
-        self.item_button = QPushButton("               Show Active Invoices               ")
-        # self.item_button.setMaximumSize(800,100)
-        self.item_button.setStyleSheet("QPushButton {color: '#DCDCDC'};")
-        self.inp_widgetsLayout.addWidget(self.item_button, alignment = Qt.AlignCenter)
-        self.item_button.setVisible(False)
         
         self.item_2 = EntryWidget("Purchase Order Reference:")
         self.inp_widgetsLayout.addWidget(self.item_2)
@@ -171,7 +169,9 @@ class PaymentDialog(InvoiceDialog):
         super().__init__(*args, **kwargs)
         self.layout.removeWidget(self.buttonBox)
         self.layout.addWidget(self.buttonBox, 5,1)
-        self.item_button.setVisible(True)
+        self.item_0.setVisible(True)
+        self.item_1.setVisible(False)
+        self.item_2.setVisible(False)
         for w in [
             self.payment_entry_widget.payment_label,
             self.payment_entry_widget.radio_button1,
@@ -372,43 +372,53 @@ class EntryPanel(QMainWindow):
             self.open_invoice_dialog()
     
     def open_payment_dialog(self):
-        new_payment_dialog = PaymentDialog(self)
-        new_payment_dialog.setWindowTitle("New Payment for "+ str(self.panel_entry[0].ledit.text()))
-        new_payment_dialog.item_button.clicked.connect(lambda : self.show_active_invoices_frm_payment(True))
-        ok = new_payment_dialog.exec_()
-        if ok and new_payment_dialog.item_1.ledit.text() and new_payment_dialog.item_3.spin_box.value() != 0:
-            if new_payment_dialog.payment_entry_widget.radio_button1.isChecked():
-                payment_method = new_payment_dialog.payment_entry_widget.radio_button1.text()
-                bank_name = None
-                cheque_no = None
-            elif new_payment_dialog.payment_entry_widget.radio_button2.isChecked():
-                payment_method = new_payment_dialog.payment_entry_widget.radio_button2.text()
-                bank_name = new_payment_dialog.payment_entry_widget.bank_name.ledit.text()
-                cheque_no = new_payment_dialog.payment_entry_widget.cheque_no.ledit.text()
+        try:
+            # Get active invoice numbers only from complete active invoices
+            complete_active_invoices = self._invoice_iterator()[1]
+            active_invoice_numb_only = []
             
-            remarks = new_payment_dialog.payment_entry_widget.remarks.tedit.toPlainText()
+            for i in range(len(complete_active_invoices)):
+                active_invoice_numb_only.append(complete_active_invoices[i]["Invoice No"])
             
-            success = write_new_payment(self, self.database_filename,
-            self.idx_no,
-            str(new_payment_dialog.item_1.ledit.text()),
-            str(new_payment_dialog.item_2.ledit.text()),
-            float(new_payment_dialog.item_3.spin_box.value()),
-            str(new_payment_dialog.item_4.calendar.selectedDate().toString()),
-            payment_method, bank_name, cheque_no, remarks            
-            )
-            if success is True:
-                self.reload()
-            if success == 3:
-                self.open_payment_dialog()
-        elif ok and new_payment_dialog.item_3.spin_box.value() == 0:
-            inform_user(self, "Payment amount was '0'. Ener a valid payment amount")
-            self.open_payment_dialog()
+            if active_invoice_numb_only:
+                new_payment_dialog = PaymentDialog(self)
+                new_payment_dialog.setWindowTitle("New Payment for "+ str(self.panel_entry[0].ledit.text()))
+                new_payment_dialog.item_0.comboBox.addItems(active_invoice_numb_only)
+                ok = new_payment_dialog.exec_()
+                
+                if ok and new_payment_dialog.item_3.spin_box.value() != 0:
+                    if new_payment_dialog.payment_entry_widget.radio_button1.isChecked():
+                        payment_method = new_payment_dialog.payment_entry_widget.radio_button1.text()
+                        bank_name = None
+                        cheque_no = None
+                    elif new_payment_dialog.payment_entry_widget.radio_button2.isChecked():
+                        payment_method = new_payment_dialog.payment_entry_widget.radio_button2.text()
+                        bank_name = new_payment_dialog.payment_entry_widget.bank_name.ledit.text()
+                        cheque_no = new_payment_dialog.payment_entry_widget.cheque_no.ledit.text()
+                    
+                    remarks = new_payment_dialog.payment_entry_widget.remarks.tedit.toPlainText()
+                    
+                    success = write_new_payment(self, self.database_filename,
+                    self.idx_no,
+                    str(new_payment_dialog.item_0.comboBox.currentText()),
+                    float(new_payment_dialog.item_3.spin_box.value()),
+                    str(new_payment_dialog.item_4.calendar.selectedDate().toString()),
+                    payment_method, bank_name, cheque_no, remarks            
+                    )
+                    if success is True:
+                        self.reload()
+                    if success == 3:
+                        self.open_payment_dialog()
+                elif ok and new_payment_dialog.item_3.spin_box.value() == 0:
+                    inform_user(self, "Payment amount was '0'. Ener a valid payment amount")
+                    self.open_payment_dialog()
+            else:
+                inform_user(self, "There are no active invoices for this compnay")
 
-        elif ok and not new_payment_dialog.item_1.ledit.text():
-            inform_user(self, "No invoice number entered. Ener a valid invoice number")
-            self.open_payment_dialog()
+        except TypeError:
+            inform_user(self, "There are no invoices for this company")
     
-    def show_active_invoices_frm_payment(self, called_from_payment=True):
+    def show_active_invoices_frm_payment(self):
         active_invoice_list = InvoiceListDialog(self)
         # BUG TODO when called from exec_, can't scroll or in child widgets like tree widget
         active_invoice_list._invoice_list_view.doubleClicked.connect(self._on_invoice_double_click)
@@ -417,15 +427,13 @@ class EntryPanel(QMainWindow):
                 for i in range(len(self._invoice_iterator()[1])):
                     item = QStandardItem(self._invoice_iterator()[1][i]["Invoice No"])
                     active_invoice_list._invoice_model.appendRow(item)
-                if called_from_payment == False:
-                    active_invoice_list.exec_()
-                else:
-                    # TODO open this widget to the side of the active dialog, instead of in the centre of it
-                    active_invoice_list.show()
+                
+                active_invoice_list.exec_()
+
         except TypeError:
-            inform_user(self, "No active invoices for ")
-        else:
-            pass
+            inform_user(self, "No invoices for this company. You can create one using 'New Invoice'")
+        else: #BUG TODO - no message is popped if there are no active invoices
+            inform_user(self, "No active invoices for this company")
     
     def _collect_widget_data(self):
         company_name = self.panel_entry[0].ledit.text()
