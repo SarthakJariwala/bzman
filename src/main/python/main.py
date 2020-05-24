@@ -8,7 +8,7 @@ from customwidgets import MasterViewerWidget
 from panels import EntryPanel, EditViewPanel
 import qdarkstyle
 from util import read_file, write_file, ask_user, inform_user, get_company_summary
-from charts import DrawPieChart
+from charts import DrawPieChart, PieWindow
 import breeze_resources
 import functools
 import operator
@@ -187,11 +187,14 @@ class WelcomeWindow(QMainWindow):
                   (resolution.height() / 2) - (self.frameSize().height() / 2)) 
     
     def load_file(self):
+        #TODO add a set_folder_location option to set file/folder location incase user moves everything to a new path
 
         self.BZMAN_settings = read_file(self.ctx.get_settings_file)
 
         if self.BZMAN_settings['path'] == "":
-            inform_user(self, "There is no database location or file. Please create a database using 'New'.")
+            inform_user(self, "There is no database location specified.\n"+
+            "If you have recently moved the file to a new location, use the 'set_folder_path' to set the new file location\n\n"+
+            "If you haven't created a database, create a new database using 'New'") #TODO add a set_folder_location option to set file/folder location incase user moves everything to a new path
         
         else:
             # x = [os.path.abspath(f) for f in os.listdir(self.BZMAN_settings['path']) if os.path.isfile(f)]
@@ -567,14 +570,14 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         idx = self.enter_company_name()
         if isinstance(idx, int):
             view_active_invoices = EditViewPanel(idx, True, self.database_filename, self.ctx)
-            view_active_invoices.show_active_invoices_frm_payment(called_from_payment=False)
+            view_active_invoices.show_active_invoices_frm_payment()
         
     def quick_summary(self):
         idx = self.enter_company_name()
         if isinstance(idx, int):
             paid, outstanding = get_company_summary(self.database_filename, idx)
             self.pie_chart = PieWindow(paid, outstanding)
-            self.pie_chart.setWindowTitle("Quick Summary for "+str(self.company_name))
+            self.pie_chart.setWindowTitle("Account Quick Summary")
             self.pie_chart.show()
 
     #def run():
