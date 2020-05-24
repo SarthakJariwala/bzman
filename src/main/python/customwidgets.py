@@ -38,27 +38,30 @@ class MasterViewerWidget(QWidget):
             self.rem_fees_lbl.setStyleSheet("QLabel {color: #ff6363;} ") # #35e3e3
         
         # Adding Quick add ToolButton
-        new_invoice_action = QAction("New Invoice", self)
-        record_payment_action = QAction("New Payment", self)
-        view_active_invoices = QAction("View Active Invoices", self)
-        quick_summ_action = QAction("Quick Summary", self)
-        self.quick_add = QToolButton()
-        self.quick_add.setIcon(QIcon(QPixmap(self.ctx.get_plus_sign)))
-        # self.quick_add.setMenu(menu)
-        self.quick_add.addAction(new_invoice_action)
-        self.quick_add.addAction(record_payment_action)
-        self.quick_add.addAction(view_active_invoices)
-        self.quick_add.addAction(quick_summ_action)
-        self.quick_add.setPopupMode(QToolButton.InstantPopup)
-        self.quick_add.setIconSize(QSize(75, 75))
-        self.quick_add.setStyleSheet('QToolButton{border: 0px solid;} QToolButton::menu-indicator { image: none;}')
+        # new_invoice_action = QAction("New Invoice", self)
+        # record_payment_action = QAction("New Payment", self)
+        # view_active_invoices = QAction("View Active Invoices", self)
+        # quick_summ_action = QAction("Quick Summary", self)
+        # self.quick_add = QToolButton()
+        # self.quick_add.setIcon(QIcon(QPixmap(self.ctx.get_plus_sign)))
+        # # self.quick_add.setMenu(menu)
+        # self.quick_add.addAction(new_invoice_action)
+        # self.quick_add.addAction(record_payment_action)
+        # self.quick_add.addAction(view_active_invoices)
+        # self.quick_add.addAction(quick_summ_action)
+        # self.quick_add.setPopupMode(QToolButton.InstantPopup)
+        # self.quick_add.setIconSize(QSize(75, 75))
+        # self.quick_add.setStyleSheet('QToolButton{border: 0px solid;} QToolButton::menu-indicator { image: none;}')
 
         self.btn_view = QPushButton("View")
-        self.btn_view.setStyleSheet("QPushButton {background-color: #46b5d1; color: black;}")#font-size:25px;}") #bbe1fa
+        self.btn_view.setMinimumHeight(65)
+        self.btn_view.setStyleSheet("QPushButton {background-color: #46b5d1; color: black; border-radius: 10px;}")#font-size:25px;}") #bbe1fa
         self.btn_edit = QPushButton("Edit")
-        self.btn_edit.setStyleSheet("QPushButton {background-color: #4ecca3; color:black;}")#font-size:25px;}")
+        self.btn_edit.setMinimumHeight(65)
+        self.btn_edit.setStyleSheet("QPushButton {background-color: #4ecca3; color:black; border-radius: 10px;}")#font-size:25px;}")
         self.btn_delete = QPushButton("Delete")
-        self.btn_delete.setStyleSheet("QPushButton {background-color: #ff4866; color: white;}")#font-size:25px;}")
+        self.btn_delete.setMinimumHeight(65)
+        self.btn_delete.setStyleSheet("QPushButton {background-color: #ff4866; color: white; border-radius: 10px;}")#font-size:25px;}")
         self.btn_delete.setVisible(False)
 
         self.vbox1 = QVBoxLayout()
@@ -67,7 +70,7 @@ class MasterViewerWidget(QWidget):
         self.vbox1.addWidget(self.contact_lbl)
         self.vbox1.addWidget(self.rem_fees_lbl)
         self.hbox2 = QHBoxLayout()
-        self.hbox2.addWidget(self.quick_add)
+        # self.hbox2.addWidget(self.quick_add)
         self.hbox2.setSpacing(30) # add stretch to create space
         self.hbox2.addWidget(self.btn_view)
         self.hbox2.addWidget(self.btn_edit)
@@ -82,32 +85,32 @@ class MasterViewerWidget(QWidget):
         self.btn_view.clicked.connect(self.open_view_window)
         self.btn_edit.clicked.connect(self.open_edit_window)
         self.btn_delete.clicked.connect(self.delete_entry)
-        new_invoice_action.triggered.connect(self.new_invoice)
-        record_payment_action.triggered.connect(self.new_payment)
-        view_active_invoices.triggered.connect(self.view_active_invoices)
-        quick_summ_action.triggered.connect(self.quick_summary)
+        # new_invoice_action.triggered.connect(self.new_invoice)
+        # record_payment_action.triggered.connect(self.new_payment)
+        # view_active_invoices.triggered.connect(self.view_active_invoices)
+        # quick_summ_action.triggered.connect(self.quick_summary)
         
         self.setLayout(self.hbox3)
 
         #self.update_button_state()
 
-    def new_invoice (self):
-        new_invoice_dialog = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
-        new_invoice_dialog.open_invoice_dialog()
+    # def new_invoice (self):
+    #     new_invoice_dialog = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
+    #     new_invoice_dialog.open_invoice_dialog()
     
-    def new_payment(self):
-        payment = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
-        payment.open_payment_dialog()
+    # def new_payment(self):
+    #     payment = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
+    #     payment.open_payment_dialog()
     
-    def view_active_invoices(self):
-        view_active_invoices = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
-        view_active_invoices.show_active_invoices_frm_payment(called_from_payment=False)
+    # def view_active_invoices(self):
+    #     view_active_invoices = EditViewPanel(self.idx_no, True, self.database_filename, self.ctx)
+    #     view_active_invoices.show_active_invoices_frm_payment(called_from_payment=False)
         
-    def quick_summary(self):
-        paid, outstanding = get_company_summary(self.database_filename, self.idx_no)
-        self.pie_chart = PieWindow(paid, outstanding)
-        self.pie_chart.setWindowTitle("Quick Summary for "+str(self.company_name))
-        self.pie_chart.show()
+    # def quick_summary(self):
+    #     paid, outstanding = get_company_summary(self.database_filename, self.idx_no)
+    #     self.pie_chart = PieWindow(paid, outstanding)
+    #     self.pie_chart.setWindowTitle("Quick Summary for "+str(self.company_name))
+    #     self.pie_chart.show()
         
 
     def open_view_window(self):

@@ -216,9 +216,9 @@ class EntryPanel(QMainWindow):
         self.tab3Layout = QGridLayout()
         tabs.addTab(self.tab1, "Information")
         tabs.addTab(self.tab2, "Invoices")
-        tabs.addTab(self.tab3, "Details")
+        tabs.addTab(self.tab3, "Comments")
         
-        # Tab1 # TODO: add QCompleter to the text entries
+        # Tab1
         item = EntryWidget("Company")#Company Name
         self.tab1Layout.addWidget(item,0,0)
         self.panel_entry.append(item)
@@ -275,13 +275,15 @@ class EntryPanel(QMainWindow):
         
         # Adding Save Button
         self.save_btn = QPushButton("Save")
-        self.save_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black;}")# #4ecca3
+        self.save_btn.setMinimumHeight(65)
+        self.save_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: 10px;}")# #4ecca3
         self.save_btn.clicked.connect(self.update_database)
         
         # Adding Undo Button
         self.undo_btn = QPushButton("Undo Changes")
+        self.undo_btn.setMinimumHeight(65)
         self.undo_btn.setStatusTip("Can only undo/revert changes if they are not saved!")
-        self.undo_btn.setStyleSheet("QPushButton {background-color: #acdbdf; color: black;}")
+        self.undo_btn.setStyleSheet("QPushButton {background-color: #acdbdf; color: black; border-radius: 10px;}")
         self.undo_btn.setVisible(False)
 
         btn_widgets = QWidget()
@@ -296,12 +298,14 @@ class EntryPanel(QMainWindow):
         self.edit_checkbox.setVisible(False)
         # Add new invoice
         self.new_invoice_btn = QPushButton("New Invoice")
-        self.new_invoice_btn.setStyleSheet("QPushButton {background-color: #927fbf; color: black;}")
+        self.new_invoice_btn.setMinimumHeight(65)
+        self.new_invoice_btn.setStyleSheet("QPushButton {background-color: #927fbf; color: black; border-radius: 10px;}")
         self.new_invoice_btn.setVisible(False)
         self.new_invoice_btn.clicked.connect(self.open_invoice_dialog)
         # Add new payment
         self.new_payment_btn = QPushButton("New Payment")
-        self.new_payment_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black;}")
+        self.new_payment_btn.setMinimumHeight(65)
+        self.new_payment_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: 10px;}")
         self.new_payment_btn.setVisible(False)
         self.new_payment_btn.clicked.connect(self.open_payment_dialog)
 

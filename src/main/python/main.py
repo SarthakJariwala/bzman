@@ -5,9 +5,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from customwidgets import MasterViewerWidget 
-from panels import EntryPanel
+from panels import EntryPanel, EditViewPanel
 import qdarkstyle
-from util import read_file, write_file, ask_user, inform_user
+from util import read_file, write_file, ask_user, inform_user, get_company_summary
 from charts import DrawPieChart
 import breeze_resources
 import functools
@@ -91,10 +91,12 @@ class WelcomeWindow(QMainWindow):
         hbox = QHBoxLayout()
         btn_new = QPushButton("   New   ")
         btn_new.setMaximumSize(300,100)
+        # btn_new.setStyleSheet("QPushButton {border-radius: 20px;}")
         btn_new.clicked.connect(self.new_file)
         hbox.addWidget(btn_new)
         btn_open = QPushButton("   Open   ")
         btn_open.setMaximumSize(300,100)
+        # btn_open.setStyleSheet("QPushButton {border-radius: 20px;}")
         btn_open.clicked.connect(self.load_file)
         hbox.addWidget(btn_open)
         hbox_widget = QWidget()
@@ -368,15 +370,16 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         self.searchbar.setCompleter(self.completer)
 
         # Adding Reload button
-        self.reload_btn = QPushButton("Reload") # TODO add a quick action (Ctrl+R (?))
-        # self.reload_btn.setMaximumSize(700,100)
-        self.reload_btn.setStyleSheet("QPushButton {background-color:#acdbdf; color:black;}")
+        self.reload_btn = QPushButton("Reload")
+        self.reload_btn.setShortcut(QKeySequence.Refresh)
+        self.reload_btn.setFixedSize(450,65)
+        self.reload_btn.setStyleSheet("QPushButton {background-color:#acdbdf; color:black; border-radius: 10px;}")
         self.reload_btn.clicked.connect(self.reload_func)
 
         # Adding "Add" Button
-        self.add_new_btn = QPushButton("Create New")
-        # self.add_new_btn.setMaximumSize(700,100)
-        self.add_new_btn.setStyleSheet("QPushButton {background-color: #927fbf;color:black}")#7045af
+        self.add_new_btn = QPushButton("Create New Customer")
+        self.add_new_btn.setFixedSize(450,65)
+        self.add_new_btn.setStyleSheet("QPushButton {background-color: #927fbf;color:black; border-radius: 10px;}")#7045af
         self.add_new_btn.clicked.connect(self.add_new_entry)
 
         # Add Checkbox to toggle delete 
@@ -385,11 +388,35 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         self.delete_checkbox.setChecked(False)
         self.delete_checkbox.stateChanged.connect(self.check_delete_state)
 
+        # Adding Quick add ToolButton
+        new_invoice_action = QAction("New Invoice", self)
+        record_payment_action = QAction("New Payment", self)
+        view_active_invoices = QAction("View Active Invoices", self)
+        quick_summ_action = QAction("Quick Company Summary", self)
+        self.quick_add = QToolButton()
+        self.quick_add.setIcon(QIcon(QPixmap(self.ctx.get_plus_sign)))
+        self.quick_add.addAction(new_invoice_action)
+        self.quick_add.addAction(record_payment_action)
+        self.quick_add.addAction(view_active_invoices)
+        self.quick_add.addAction(quick_summ_action)
+        self.quick_add.setPopupMode(QToolButton.InstantPopup)
+        self.quick_add.setIconSize(QSize(75, 75))
+        self.quick_add.setStyleSheet('QToolButton{border: 0px solid;} QToolButton::menu-indicator { image: none;}')
+        new_invoice_action.triggered.connect(self.new_invoice)
+        record_payment_action.triggered.connect(self.new_payment)
+        view_active_invoices.triggered.connect(self.view_active_invoices)
+        quick_summ_action.triggered.connect(self.quick_summary)
+
         btn_container = QWidget()
         hbox1 = QHBoxLayout()
+        hbox1.addWidget(self.quick_add)
+        hbox1.addItem(QSpacerItem(35, 35, QSizePolicy.Fixed))
         hbox1.addWidget(self.add_new_btn)
+        hbox1.addItem(QSpacerItem(35, 35, QSizePolicy.Fixed))
         hbox1.addWidget(self.reload_btn)
+        hbox1.addItem(QSpacerItem(35, 35, QSizePolicy.Fixed))
         hbox1.addWidget(self.delete_checkbox)
+        hbox1.setAlignment(Qt.AlignLeft)
         btn_container.setLayout(hbox1)
 
         pie_w_control = QWidget()
@@ -436,6 +463,7 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         
         total_outstanding = sum(outstanding)
         total_paid = sum(paid)
+        self._company_list_for_quick_actions = company_names
         return company_names, contact_names, outstanding, total_outstanding, total_paid
     
     def load_widgets(self):
@@ -499,6 +527,55 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         else:
             for i in range(len(self.widgets)):
                 self.widgets[i].btn_delete.setVisible(False)
+    
+    def enter_company_name(self):
+        dlg =  QInputDialog(self)                 
+        dlg.setInputMode(QInputDialog.TextInput) 
+        dlg.setWindowTitle('Enter Company Name')
+        dlg.setLabelText('Company Name')    
+        line_edit = dlg.findChild(QLineEdit) # search Qlineedit child to set QCompleter 
+        completer = QCompleter(self._company_list_for_quick_actions, line_edit)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)       
+        line_edit.setCompleter(completer)           
+        dlg.resize(800,100)                             
+        ok = dlg.exec_()                                
+        company_name = dlg.textValue()
+
+        if ok and company_name:
+            if company_name in self._company_list_for_quick_actions:
+                return self._company_list_for_quick_actions.index(company_name)
+
+            elif not company_name in self._company_list_for_quick_actions:
+                inform_user(self, "This company name does not exist in database.\n\nIf this is a new customer, please use the 'Create New Customer' option.")
+
+        elif ok and not company_name:
+            inform_user(self, "Please enter a valid company name")
+
+    def new_invoice (self):
+        idx = self.enter_company_name()
+        if isinstance(idx, int):
+            new_invoice_dialog = EditViewPanel(idx, True, self.database_filename, self.ctx)
+            new_invoice_dialog.open_invoice_dialog()
+    
+    def new_payment(self):
+        idx = self.enter_company_name()
+        if isinstance(idx, int):
+            payment = EditViewPanel(idx, True, self.database_filename, self.ctx)
+            payment.open_payment_dialog()
+    
+    def view_active_invoices(self):
+        idx = self.enter_company_name()
+        if isinstance(idx, int):
+            view_active_invoices = EditViewPanel(idx, True, self.database_filename, self.ctx)
+            view_active_invoices.show_active_invoices_frm_payment(called_from_payment=False)
+        
+    def quick_summary(self):
+        idx = self.enter_company_name()
+        if isinstance(idx, int):
+            paid, outstanding = get_company_summary(self.database_filename, idx)
+            self.pie_chart = PieWindow(paid, outstanding)
+            self.pie_chart.setWindowTitle("Quick Summary for "+str(self.company_name))
+            self.pie_chart.show()
 
     #def run():
     #    app = QApplication(sys.argv)
@@ -520,6 +597,8 @@ def run():
                 font = QFont("Open Sans")
             except:
                 font = QFont("Arial")
+        finally:
+            font.setPointSize(14)
         appctxt.app.setFont(font)
         appctxt.app.setStyle("Fusion")
         # appctxt.app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
