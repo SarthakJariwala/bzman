@@ -1,21 +1,21 @@
 [
     {
-        "Company Name": "My First Company",
-        "Contact Name": "My First Contact",
-        "Address": "CompanyVille, USA",
-        "Email": "contact@company.com",
+        "Company Name": "Sharma Tiles",
+        "Contact Name": "Shyam Sharma",
+        "Address": "Mumbai, Maharashtra, India",
+        "Email": "shyam@sharmatiles.com",
         "Phone No.": "987654321",
         "Fax No.": "",
         "Total Business": 11500.0,
-        "Total Paid": 1200.0,
-        "Outstanding": 10300.0,
+        "Total Paid": 3500.0,
+        "Outstanding": 8000.0,
         "Details": "Met through the contact at XYZ",
         "Invoices": {
             "Invoice 1": {
                 "Invoice No": "123456789",
                 "P/O ref": "abcd",
                 "Invoice Amount": 10000.0,
-                "Outstanding": 9800.0,
+                "Outstanding": 7600.0,
                 "Issue Date": "Wed May 20 2020",
                 "Payments": {
                     "Payment 1": {
@@ -25,6 +25,18 @@
                         "Bank Name": "SBI",
                         "Cheque No": "XXXXX",
                         "Remarks": "Paid on time"
+                    },
+                    "Payment 2": {
+                        "Payment Date": "Sat May 23 2020",
+                        "Payment Amount": 200.0,
+                        "Payment Method": "Cash",
+                        "Remarks": ""
+                    },
+                    "Payment 3": {
+                        "Payment Date": "Sat May 23 2020",
+                        "Payment Amount": 2000.0,
+                        "Payment Method": "Cash",
+                        "Remarks": ""
                     }
                 }
             },
@@ -32,12 +44,18 @@
                 "Invoice No": "987654321",
                 "P/O ref": "qwerty",
                 "Invoice Amount": 1500.0,
-                "Outstanding": 500.0,
+                "Outstanding": 400.0,
                 "Issue Date": "Thu May 21 2020",
                 "Payments": {
                     "Payment 1": {
                         "Payment Date": "Sat May 23 2020",
                         "Payment Amount": 1000.0,
+                        "Payment Method": "Cash",
+                        "Remarks": ""
+                    },
+                    "Payment 2": {
+                        "Payment Date": "Sat May 23 2020",
+                        "Payment Amount": 100.0,
                         "Payment Method": "Cash",
                         "Remarks": ""
                     }
@@ -54,15 +72,15 @@
         "Phone No.": "987654321",
         "Fax No.": "",
         "Total Business": 10000.0,
-        "Total Paid": 3200.0,
-        "Outstanding": 6800.0,
+        "Total Paid": 10000.0,
+        "Outstanding": 0.0,
         "Details": "Met through the contact at ABCD",
         "Invoices": {
             "Invoice 1": {
                 "Invoice No": "123456789",
                 "P/O ref": "abcd",
                 "Invoice Amount": 10000.0,
-                "Outstanding": 6800.0,
+                "Outstanding": 0.0,
                 "Issue Date": "Wed May 20 2020",
                 "Payments": {
                     "Payment 1": {
@@ -78,6 +96,14 @@
                         "Payment Amount": 3000.0,
                         "Payment Method": "Cash",
                         "Remarks": "Delivered by Mr. XYZ"
+                    },
+                    "Payment 3": {
+                        "Payment Date": "Sat May 23 2020",
+                        "Payment Amount": 6800.0,
+                        "Payment Method": "Cheque",
+                        "Bank Name": "HDFC",
+                        "Cheque No": "XXXX",
+                        "Remarks": "final amount for this invoice"
                     }
                 }
             }
@@ -130,6 +156,38 @@
         "Address": "CompanyVille, USA",
         "Email": "contact@company.com",
         "Phone No.": "",
+        "Fax No.": "",
+        "Total Business": 20000.0,
+        "Total Paid": 5000.0,
+        "Outstanding": 15000.0,
+        "Details": "",
+        "Invoices": {
+            "Invoice 1": {
+                "Invoice No": "987612345",
+                "P/O ref": "abcd",
+                "Invoice Amount": 20000.0,
+                "Outstanding": 15000.0,
+                "Issue Date": "Fri May 22 2020",
+                "Payments": {
+                    "Payment 1": {
+                        "Payment Date": "Sat May 23 2020",
+                        "Payment Amount": 5000.0,
+                        "Payment Method": "Cheque",
+                        "Bank Name": "ICICI",
+                        "Cheque No": "XXXXX",
+                        "Remarks": "first payment"
+                    }
+                }
+            }
+        },
+        "Price Quote Log": ""
+    },
+    {
+        "Company Name": "John's Harware Store",
+        "Contact Name": "John",
+        "Address": "Companyville, Companytown",
+        "Email": "john@gmail.com",
+        "Phone No.": "XXXXXXXX",
         "Fax No.": "",
         "Total Business": 0,
         "Total Paid": 0,
