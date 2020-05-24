@@ -33,8 +33,8 @@ class DrawPieChart(QGraphicsWidget):
     def draw_pie_chart(self):
 
         series = QPieSeries()
-        series.append("Paid - " + str(self.paid), self.paid)
-        series.append("Outstanding - " + str(self.outstanding), self.outstanding)
+        series.append("  Paid: " + str(self.paid)+" ", self.paid)
+        series.append("  Outstanding: " + str(self.outstanding)+" ", self.outstanding)
 
         font = QFont()
         font.setPointSize(14)
@@ -43,7 +43,7 @@ class DrawPieChart(QGraphicsWidget):
 
         slice = QPieSlice()
         slice = series.slices()
-        slice[0].setExploded(True)
+        # slice[0].setExploded(True)
         slice[0].setLabelVisible(True)
         # slice.setPen(QPen(QColor("#ff4866"), 2))
         slice[0].setBrush(QColor("#4ecca3"))
@@ -51,10 +51,10 @@ class DrawPieChart(QGraphicsWidget):
         slice[0].setLabelFont(font)
         # slice[0].setLabelPosition(slice[0].LabelInsideHorizontal)
 
-        slice[1].setExploded(True)
+        # slice[1].setExploded(True)
         slice[1].setLabelVisible(True)
-        slice[1].setBrush(QColor("#ff4866"))
-        slice[1].setLabelBrush(QColor("#ff4866")) # "#ff4866"
+        slice[1].setBrush(QColor("#d95555"))
+        slice[1].setLabelBrush(QColor("#d95555")) # "#ff4866"
         slice[1].setLabelFont(font)
         # slice[1].setLabelPosition(slice[1].LabelInsideHorizontal)
 
@@ -63,7 +63,7 @@ class DrawPieChart(QGraphicsWidget):
         chart.createDefaultAxes()
         chart.setAnimationOptions(QChart.SeriesAnimations)
         chart.setTitle("Overview - Total Business : "+ str(self.paid + self.outstanding))
-        font.setPointSize(20)
+        font.setPointSize(18)
         chart.setTitleFont(font)
         chart.legend().setVisible(True)
         chart.legend().setLabelBrush(QBrush(QColor("#ffffff"))) # 927fbf
