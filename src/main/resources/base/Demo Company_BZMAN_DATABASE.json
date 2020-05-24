@@ -65,10 +65,10 @@
         "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2000 for ABCD stack - told them this is the lowest we will go. discount 20%"
     },
     {
-        "Company Name": "My Second Company",
-        "Contact Name": "My Second Contact",
-        "Address": "CompanyVille, USA",
-        "Email": "contact@company.com",
+        "Company Name": "Exotic Travels Ltd.",
+        "Contact Name": "Jane Doe",
+        "Address": "Louisville, USA",
+        "Email": "jane.doe@gmail.com",
         "Phone No.": "987654321",
         "Fax No.": "",
         "Total Business": 10000.0,
@@ -111,10 +111,10 @@
         "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2500 for ABCD stack - told them this is the lowest we will go"
     },
     {
-        "Company Name": "My Third Company",
-        "Contact Name": "My Third Contact",
-        "Address": "CompanyVille, USA",
-        "Email": "contact@company.com",
+        "Company Name": "Jonas Bistro",
+        "Contact Name": "Jim Jonas",
+        "Address": "London, UK",
+        "Email": "jim@jonasbistro.com",
         "Phone No.": "987654321",
         "Fax No.": "",
         "Total Business": 12000.0,
@@ -151,15 +151,15 @@
         "Price Quote Log": "Last price quote was 3000 for a stack of ABCD\n\nNew negotiated quote was 2000 for ABCD stack - told them this is the lowest we will go"
     },
     {
-        "Company Name": "My Fourth Company",
-        "Contact Name": "My Fourth Conatact",
-        "Address": "CompanyVille, USA",
-        "Email": "contact@company.com",
+        "Company Name": "Ram's Travel Inc",
+        "Contact Name": "Ram Patel",
+        "Address": "Mumbai, India",
+        "Email": "ram@gmail.com",
         "Phone No.": "",
         "Fax No.": "",
-        "Total Business": 20000.0,
+        "Total Business": 70000.0,
         "Total Paid": 5000.0,
-        "Outstanding": 15000.0,
+        "Outstanding": 65000.0,
         "Details": "",
         "Invoices": {
             "Invoice 1": {
@@ -178,6 +178,14 @@
                         "Remarks": "first payment"
                     }
                 }
+            },
+            "Invoice 2": {
+                "Invoice No": "654320122",
+                "P/O ref": "3456ac12",
+                "Invoice Amount": 50000.0,
+                "Outstanding": 50000.0,
+                "Issue Date": "Sat May 23 2020",
+                "Payments": {}
             }
         },
         "Price Quote Log": ""
