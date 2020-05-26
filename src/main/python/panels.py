@@ -275,20 +275,21 @@ class EntryPanel(QMainWindow):
         
         # Adding Save Button
         self.save_btn = QPushButton("Save")
-        self.save_btn.setMinimumHeight(65)
-        self.save_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: 10px;}")# #4ecca3
+        self.save_btn.setFixedSize(350,65)
+        self.save_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: 20px;}")# #4ecca3
         self.save_btn.clicked.connect(self.update_database)
         
         # Adding Undo Button
         self.undo_btn = QPushButton("Undo Changes")
-        self.undo_btn.setMinimumHeight(65)
+        self.undo_btn.setFixedSize(350,65)
         self.undo_btn.setStatusTip("Can only undo/revert changes if they are not saved!")
-        self.undo_btn.setStyleSheet("QPushButton {background-color: #acdbdf; color: black; border-radius: 10px;}")
+        self.undo_btn.setStyleSheet("QPushButton {background-color: #acdbdf; color: black; border-radius: 20px;}")
         self.undo_btn.setVisible(False)
 
         btn_widgets = QWidget()
         btn_widgets_layout = QHBoxLayout()
         btn_widgets_layout.addWidget(self.save_btn)
+        btn_widgets_layout.addItem(QSpacerItem(35, 35, QSizePolicy.Fixed))
         btn_widgets_layout.addWidget(self.undo_btn)
         btn_widgets.setLayout(btn_widgets_layout)
 
@@ -298,14 +299,14 @@ class EntryPanel(QMainWindow):
         self.edit_checkbox.setVisible(False)
         # Add new invoice
         self.new_invoice_btn = QPushButton("New Invoice")
-        self.new_invoice_btn.setMinimumHeight(65)
-        self.new_invoice_btn.setStyleSheet("QPushButton {background-color: #927fbf; color: black; border-radius: 10px;}")
+        self.new_invoice_btn.setFixedSize(300,65)
+        self.new_invoice_btn.setStyleSheet("QPushButton {background-color: #927fbf; color: black; border-radius: 20px;}")
         self.new_invoice_btn.setVisible(False)
         self.new_invoice_btn.clicked.connect(self.open_invoice_dialog)
         # Add new payment
         self.new_payment_btn = QPushButton("New Payment")
-        self.new_payment_btn.setMinimumHeight(65)
-        self.new_payment_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: 10px;}")
+        self.new_payment_btn.setFixedSize(300,65)
+        self.new_payment_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: 20px;}")
         self.new_payment_btn.setVisible(False)
         self.new_payment_btn.clicked.connect(self.open_payment_dialog)
 
@@ -313,6 +314,7 @@ class EntryPanel(QMainWindow):
         edit_layout = QHBoxLayout()
         edit_layout.addWidget(self.edit_checkbox)
         edit_layout.addWidget(self.new_invoice_btn)
+        edit_layout.addItem(QSpacerItem(35, 35, QSizePolicy.Fixed))
         edit_layout.addWidget(self.new_payment_btn)
         edit_widget.setLayout(edit_layout)
 

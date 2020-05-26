@@ -54,14 +54,14 @@ class MasterViewerWidget(QWidget):
         # self.quick_add.setStyleSheet('QToolButton{border: 0px solid;} QToolButton::menu-indicator { image: none;}')
 
         self.btn_view = QPushButton("View")
-        self.btn_view.setMinimumHeight(65)
-        self.btn_view.setStyleSheet("QPushButton {background-color: #46b5d1; color: black; border-radius: 10px;}")#font-size:25px;}") #bbe1fa
+        self.btn_view.setFixedSize(175,65) #46b5d1
+        self.btn_view.setStyleSheet("QPushButton {background-color: #acdbdf; color: black; border-radius: 20px;}")#font-size:25px;}") #bbe1fa
         self.btn_edit = QPushButton("Edit")
-        self.btn_edit.setMinimumHeight(65)
-        self.btn_edit.setStyleSheet("QPushButton {background-color: #4ecca3; color:black; border-radius: 10px;}")#font-size:25px;}")
+        self.btn_edit.setFixedSize(175,65)
+        self.btn_edit.setStyleSheet("QPushButton {background-color: #4ecca3; color:black; border-radius: 20px;}")#font-size:25px;}")
         self.btn_delete = QPushButton("Delete")
-        self.btn_delete.setMinimumHeight(65)
-        self.btn_delete.setStyleSheet("QPushButton {background-color: #ff4866; color: white; border-radius: 10px;}")#font-size:25px;}")
+        self.btn_delete.setFixedSize(175,65)
+        self.btn_delete.setStyleSheet("QPushButton {background-color: #ff4866; color: white; border-radius: 20px;}")#font-size:25px;}")
         self.btn_delete.setVisible(False)
 
         self.vbox1 = QVBoxLayout()

@@ -426,15 +426,15 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         # Adding Reload button
         self.reload_btn = QPushButton("Reload")
         self.reload_btn.setShortcut(QKeySequence.Refresh)
-        self.reload_btn.setFixedSize(450,65)
-        self.reload_btn.setStyleSheet("QPushButton {background-color:#acdbdf; color:black; border-radius: 10px;}")
+        self.reload_btn.setFixedSize(250,65)
+        self.reload_btn.setStyleSheet("QPushButton {background-color:#acdbdf; color:black; border-radius: 20px;}")
         self.reload_btn.clicked.connect(self.reload_func)
 
-        # Adding "Add" Button
-        self.add_new_btn = QPushButton("Create New Customer")
-        self.add_new_btn.setFixedSize(450,65)
-        self.add_new_btn.setStyleSheet("QPushButton {background-color: #927fbf;color:black; border-radius: 10px;}")#7045af
-        self.add_new_btn.clicked.connect(self.add_new_entry)
+        # Adding "Add" Button ----> added as a quick action
+        # self.add_new_btn = QPushButton("Create New Customer")
+        # self.add_new_btn.setFixedSize(450,65)
+        # self.add_new_btn.setStyleSheet("QPushButton {background-color: #927fbf;color:black; border-radius: 10px;}")#7045af
+        # self.add_new_btn.clicked.connect(self.add_new_entry)
 
         # Add Checkbox to toggle delete 
         self.delete_checkbox = QCheckBox("Enable Delete")
@@ -443,12 +443,14 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         self.delete_checkbox.stateChanged.connect(self.check_delete_state)
 
         # Adding Quick add ToolButton
+        add_new_customer = QAction("New Customer", self)
         new_invoice_action = QAction("New Invoice", self)
         record_payment_action = QAction("New Payment", self)
         view_active_invoices = QAction("View Active Invoices", self)
         quick_summ_action = QAction("Quick Company Summary", self)
         self.quick_add = QToolButton()
         self.quick_add.setIcon(QIcon(QPixmap(self.ctx.get_plus_sign)))
+        self.quick_add.addAction(add_new_customer)
         self.quick_add.addAction(new_invoice_action)
         self.quick_add.addAction(record_payment_action)
         self.quick_add.addAction(view_active_invoices)
@@ -456,6 +458,7 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         self.quick_add.setPopupMode(QToolButton.InstantPopup)
         self.quick_add.setIconSize(QSize(75, 75))
         self.quick_add.setStyleSheet('QToolButton{border: 0px solid;} QToolButton::menu-indicator { image: none;}')
+        add_new_customer.triggered.connect(self.add_new_entry)
         new_invoice_action.triggered.connect(self.new_invoice)
         record_payment_action.triggered.connect(self.new_payment)
         view_active_invoices.triggered.connect(self.view_active_invoices)
@@ -465,7 +468,8 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         hbox1 = QHBoxLayout()
         hbox1.addWidget(self.quick_add)
         hbox1.addItem(QSpacerItem(35, 35, QSizePolicy.Fixed))
-        hbox1.addWidget(self.add_new_btn)
+        hbox1.addWidget(self.searchbar)
+        # hbox1.addWidget(self.add_new_btn)
         hbox1.addItem(QSpacerItem(35, 35, QSizePolicy.Fixed))
         hbox1.addWidget(self.reload_btn)
         hbox1.addItem(QSpacerItem(35, 35, QSizePolicy.Fixed))
@@ -483,7 +487,7 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         container = QWidget()
         containerLayout = QVBoxLayout()
         containerLayout.addWidget(btn_container)
-        containerLayout.addWidget(self.searchbar)
+        # containerLayout.addWidget(self.searchbar)
         # containerLayout.addWidget(self.overall_view_widget)
         # containerLayout.addWidget(self.scroll)
         containerLayout.addWidget(pie_w_control)
@@ -628,7 +632,7 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         if isinstance(idx, int):
             paid, outstanding = get_company_summary(self.database_filename, idx)
             self.pie_chart = PieWindow(paid, outstanding)
-            self.pie_chart.setWindowTitle("Account Quick Summary")
+            self.pie_chart.setWindowTitle("Quick Account Summary")
             self.pie_chart.show()
 
     #def run():
