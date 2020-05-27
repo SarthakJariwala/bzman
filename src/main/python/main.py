@@ -1,4 +1,6 @@
-from fbs_runtime.application_context.PyQt5 import ApplicationContext, cached_property
+from fbs_runtime.application_context.PyQt5 import ApplicationContext 
+from fbs_runtime.application_context import cached_property, is_frozen
+from fbs_runtime.excepthook.sentry import SentryExceptionHandler
 import sys
 import os
 from datetime import datetime
@@ -23,6 +25,27 @@ class AppContext(ApplicationContext):
         # window.resize(250, 150) 
         window.show()
         return self.app.exec_()
+    
+    @cached_property
+    def exception_handlers(self):
+        result = super().exception_handlers
+        if is_frozen():
+            result.append(self.sentry_exception_handler)
+        return result
+    
+    @cached_property
+    def sentry_exception_handler(self):
+        return SentryExceptionHandler(
+            self.build_settings['sentry_dsn'],
+            self.build_settings['version'],
+            self.build_settings['environment']
+        )
+    
+    # def _on_sentry_init(self):
+    #     scope = self.sentry_exception_handler.scope
+    #     from fbs_runtime import platform
+    #     scope.set_extra('os', platform.name())
+    #     scope.user = {'email': 'john@gmail.com'}
 
     @cached_property
     def get_logo(self):
@@ -77,16 +100,18 @@ class WelcomeWindow(QMainWindow):
         self.check_trial_validity()
 
         self.setWindowTitle("Welcome to BZMAN!")
+        version_no = self.ctx.build_settings['version']
 
         text = "<center>" \
             "<br><br><h1></h1>" \
             "&#8291;" \
             "<img src=%r>" \
             "</center>" \
-            "<p>BZMAN<br/>"\
-            "Version 0.2.Beta</p>"\
+            "<p>BZMAN</p>"\
             % self.ctx.get_logo#<br/>" \
             # "Copyright &copy; JSS Inc.</p>"
+        
+        text += "Version "+version_no
         label = QLabel(text)
         label.setAlignment(Qt.AlignCenter)
 
@@ -261,7 +286,9 @@ class WelcomeWindow(QMainWindow):
             
             except OSError: #TODO maybe set the file path to ""; if file can not be found
                 inform_user(self, "The database folder has been moved or deleted! If moved, use 'Open' or 'Set New Path'")
-    
+                # sentry_handler = self.ctx.sentry_exception_handler()
+                # sentry_handler.handle()
+            # 
     def _open_main_window(self, filename):
         self.main_window = MainWindow(filename, self.ctx)
         self.main_window.show()
