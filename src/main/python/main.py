@@ -219,44 +219,48 @@ class WelcomeWindow(QMainWindow):
             )
         
         else:
-            # x = [os.path.abspath(f) for f in os.listdir(self.BZMAN_settings['path']) if os.path.isfile(f)]
-            x = os.listdir(self.BZMAN_settings['path'])
-            temp_list =[]
-            filename = None
-            for i in range(len(x)):
-                if x[i].find("_BZMAN_DATABASE.json") != -1:
-                    temp_list.append(x[i])
-            
-            if len(temp_list) >1:
-                inform_user(self, "There are more than one database files. Please select the one you want to open")
-                filename = QFileDialog.getOpenFileName(self, "Open", self.BZMAN_settings['path'], filter="Database Files (*.json)")[0]
-
-            elif len(temp_list) == 0:
-                ans = ask_user(self, "No Company Database found! \n\n" + "If you haven't created a company database yet, you can do it using 'New' option. Click 'Ok' to create a new database.\n\n"+
-                "If you have already created a Database but moved it to a differenct location, please open it manually by clicking 'Cancel'.")
-                if ans == QMessageBox.Ok:
-                    self.new_file()
-                elif ans == QMessageBox.Cancel:
+            try:
+                # x = [os.path.abspath(f) for f in os.listdir(self.BZMAN_settings['path']) if os.path.isfile(f)]
+                x = os.listdir(self.BZMAN_settings['path'])
+                temp_list =[]
+                filename = None
+                for i in range(len(x)):
+                    if x[i].find("_BZMAN_DATABASE.json") != -1:
+                        temp_list.append(x[i])
+                
+                if len(temp_list) >1:
+                    inform_user(self, "There are more than one database files. Please select the one you want to open")
                     filename = QFileDialog.getOpenFileName(self, "Open", self.BZMAN_settings['path'], filter="Database Files (*.json)")[0]
-                    if filename:
-                        ans = ask_user(self, "Do you want to save this file location for future use? This will overwrite your existing path where the file wasn't found.")
 
-                        if ans == QMessageBox.Ok:
-                            new_path, new_filename = os.path.split(filename)
-                            new_company_name = " ".join(os.path.split(os.path.splitext(filename)[0])[1].split('_')[:-2])
-                            self.BZMAN_settings['path'] = new_path
-                            self.BZMAN_settings['database_name'] = new_filename
-                            self.BZMAN_settings['company'] = new_company_name
-                            write_file(self.BZMAN_settings, self.ctx.get_settings_file)
+                elif len(temp_list) == 0:
+                    ans = ask_user(self, "No Company Database found! \n\n" + "If you haven't created a company database yet, you can do it using 'New' option. Click 'Ok' to create a new database.\n\n"+
+                    "If you have already created a Database but moved it to a differenct location, please open it manually by clicking 'Cancel'.")
+                    if ans == QMessageBox.Ok:
+                        self.new_file()
+                    elif ans == QMessageBox.Cancel:
+                        filename = QFileDialog.getOpenFileName(self, "Open", self.BZMAN_settings['path'], filter="Database Files (*.json)")[0]
+                        if filename:
+                            ans = ask_user(self, "Do you want to save this file location for future use? This will overwrite your existing path where the file wasn't found.")
 
-                else: #4194304
-                    pass
+                            if ans == QMessageBox.Ok:
+                                new_path, new_filename = os.path.split(filename)
+                                new_company_name = " ".join(os.path.split(os.path.splitext(filename)[0])[1].split('_')[:-2])
+                                self.BZMAN_settings['path'] = new_path
+                                self.BZMAN_settings['database_name'] = new_filename
+                                self.BZMAN_settings['company'] = new_company_name
+                                write_file(self.BZMAN_settings, self.ctx.get_settings_file)
 
-            else:
-                filename = os.path.join(self.BZMAN_settings['path'] + '/' + temp_list[0])
+                    else: #4194304
+                        pass
 
-            if filename:
-                self._open_main_window(filename)
+                else:
+                    filename = os.path.join(self.BZMAN_settings['path'] + '/' + temp_list[0])
+
+                if filename:
+                    self._open_main_window(filename)
+            
+            except OSError: #TODO maybe set the file path to ""; if file can not be found
+                inform_user(self, "The database folder has been moved or deleted! If moved, use 'Open' or 'Set New Path'")
     
     def _open_main_window(self, filename):
         self.main_window = MainWindow(filename, self.ctx)
