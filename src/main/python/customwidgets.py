@@ -52,16 +52,16 @@ class MasterViewerWidget(QWidget):
         # self.quick_add.setPopupMode(QToolButton.InstantPopup)
         # self.quick_add.setIconSize(QSize(75, 75))
         # self.quick_add.setStyleSheet('QToolButton{border: 0px solid;} QToolButton::menu-indicator { image: none;}')
-
+        pix = str(self.ctx.available_geo().width()/136)+"px" # for 20px border-radius
         self.btn_view = QPushButton("View")
-        self.btn_view.setFixedSize(175,65) #46b5d1
-        self.btn_view.setStyleSheet("QPushButton {background-color: #acdbdf; color: black; border-radius: 20px;}")#font-size:25px;}") #bbe1fa
+        self.btn_view.setFixedSize(self.ctx.available_geo().width()/15.6,self.ctx.available_geo().height()/26.83) #46b5d1
+        self.btn_view.setStyleSheet("QPushButton {background-color: #acdbdf; color: black; border-radius: "+pix+";}")#font-size:25px;}") #bbe1fa
         self.btn_edit = QPushButton("Edit")
-        self.btn_edit.setFixedSize(175,65)
-        self.btn_edit.setStyleSheet("QPushButton {background-color: #4ecca3; color:black; border-radius: 20px;}")#font-size:25px;}")
+        self.btn_edit.setFixedSize(self.ctx.available_geo().width()/15.6,self.ctx.available_geo().height()/26.83)
+        self.btn_edit.setStyleSheet("QPushButton {background-color: #4ecca3; color:black; border-radius: "+pix+";}")#font-size:25px;}")
         self.btn_delete = QPushButton("Delete")
-        self.btn_delete.setFixedSize(175,65)
-        self.btn_delete.setStyleSheet("QPushButton {background-color: #ff4866; color: white; border-radius: 20px;}")#font-size:25px;}")
+        self.btn_delete.setFixedSize(self.ctx.available_geo().width()/15.6,self.ctx.available_geo().height()/26.83)
+        self.btn_delete.setStyleSheet("QPushButton {background-color: #ff4866; color: white; border-radius: "+pix+";}")#font-size:25px;}")
         self.btn_delete.setVisible(False)
 
         self.vbox1 = QVBoxLayout()

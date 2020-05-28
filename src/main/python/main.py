@@ -47,6 +47,9 @@ class AppContext(ApplicationContext):
     #     scope.set_extra('os', platform.name())
     #     scope.user = {'email': 'john@gmail.com'}
 
+    def available_geo(self):
+        return self.app.desktop().availableGeometry()
+
     @cached_property
     def get_logo(self):
         return self.get_resource('logo.png')
@@ -111,18 +114,25 @@ class WelcomeWindow(QMainWindow):
             % self.ctx.get_logo#<br/>" \
             # "Copyright &copy; JSS Inc.</p>"
         
+        # text = QPixmap().setPixmap(self.ctx.get_logo)
+        # text += "\nBZMAN\n"
+        
         text += "Version "+version_no
         label = QLabel(text)
+        # label.setPixmap(QPixmap(self.ctx.get_logo))
+        # label.setText("\nVersion "+version_no)
+        # label.setMaximumSize(self.ctx.available_geo().width()/2,self.ctx.available_geo().height()/1.5)
         label.setAlignment(Qt.AlignCenter)
+        # label.setFixedSize(self.ctx.available_geo().width()/5,self.ctx.available_geo().height()/5)
 
         hbox = QHBoxLayout()
         btn_new = QPushButton("   New   ")
-        btn_new.setMaximumSize(300,100)
+        btn_new.setMaximumSize(self.ctx.available_geo().width()/9.12,self.ctx.available_geo().height()/17.44)
         # btn_new.setStyleSheet("QPushButton {border-radius: 20px;}")
         btn_new.clicked.connect(self.new_file)
         hbox.addWidget(btn_new)
         btn_open = QPushButton("   Open   ")
-        btn_open.setMaximumSize(300,100)
+        btn_open.setMaximumSize(self.ctx.available_geo().width()/9.12,self.ctx.available_geo().height()/17.44)
         # btn_open.setStyleSheet("QPushButton {border-radius: 20px;}")
         btn_open.clicked.connect(self.load_file)
         hbox.addWidget(btn_open)
@@ -337,7 +347,7 @@ class WelcomeWindow(QMainWindow):
         dlg.setInputMode(QInputDialog.TextInput) 
         dlg.setWindowTitle('New Database : Enter Your Company Name')
         dlg.setLabelText('Company Name')                        
-        dlg.resize(800,100)                             
+        dlg.resize(self.ctx.available_geo().width()/3.42,self.ctx.available_geo().height()/17.44)                             
         ok = dlg.exec_()                                
         filename = dlg.textValue()
 
@@ -457,8 +467,9 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         # Adding Reload button
         self.reload_btn = QPushButton("Reload")
         self.reload_btn.setShortcut(QKeySequence.Refresh)
-        self.reload_btn.setFixedSize(250,65)
-        self.reload_btn.setStyleSheet("QPushButton {background-color:#acdbdf; color:black; border-radius: 20px;}")
+        self.reload_btn.setFixedSize(self.ctx.available_geo().width()/11,self.ctx.available_geo().height()/26.83)
+        pix = str(self.ctx.available_geo().width()/136)+"px" # for 20px border-radius
+        self.reload_btn.setStyleSheet("QPushButton {background-color:#acdbdf; color:black; border-radius: "+pix+";}")
         self.reload_btn.clicked.connect(self.reload_func)
 
         # Adding "Add" Button ----> added as a quick action
@@ -487,7 +498,7 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         self.quick_add.addAction(view_active_invoices)
         self.quick_add.addAction(quick_summ_action)
         self.quick_add.setPopupMode(QToolButton.InstantPopup)
-        self.quick_add.setIconSize(QSize(75, 75))
+        self.quick_add.setIconSize(QSize(self.ctx.available_geo().width()/36.5,self.ctx.available_geo().width()/36.5))
         self.quick_add.setStyleSheet('QToolButton{border: 0px solid;} QToolButton::menu-indicator { image: none;}')
         add_new_customer.triggered.connect(self.add_new_entry)
         new_invoice_action.triggered.connect(self.new_invoice)

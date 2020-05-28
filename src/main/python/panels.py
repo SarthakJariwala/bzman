@@ -13,6 +13,7 @@ class EntryWidget(QWidget):
 
         self.lbl = QLabel(self.name)
         self.ledit = QLineEdit()
+        self.ledit.setStyleSheet("QLineEdit {color:#C0C0C0};")
 
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.lbl)
@@ -43,6 +44,7 @@ class EntryTextEditWidget(QWidget):
 
         self.lbl = QLabel(self.name)
         self.tedit = QTextEdit()
+        self.tedit.setStyleSheet("QTextEdit {color:#C0C0C0};")
 
         self.vbox1 = QVBoxLayout()
         self.vbox1.addWidget(self.lbl)
@@ -207,12 +209,16 @@ class EntryPanel(QMainWindow):
         self.panel_entry = []
 
         tabs = QTabWidget()
-        tabs.setStyleSheet('QTabBar::tab {height: 100px; width: 300px; font-weight:bold;}')
+        tabs.setMinimumSize(self.ctx.available_geo().width()/15,self.ctx.available_geo().height()/3)
+        tabs.setStyleSheet('QTabBar::tab {font-weight:bold;}') # height: 100px; width: 300px; 
         self.tab1 = QWidget()
+        # self.tab1.setMinimumSize(self.ctx.available_geo().width()/15,self.ctx.available_geo().height()/3)
         self.tab1Layout = QGridLayout() 
         self.tab2 = QWidget()
+        # self.tab2.setMinimumSize(self.ctx.available_geo().width()/15,self.ctx.available_geo().height()/3)
         self.tab2Layout = QGridLayout()
         self.tab3 = QWidget()
+        # self.tab3.setMinimumSize(self.ctx.available_geo().width()/15,self.ctx.available_geo().height()/3)
         self.tab3Layout = QGridLayout()
         tabs.addTab(self.tab1, "Information")
         tabs.addTab(self.tab2, "Invoices")
@@ -264,6 +270,7 @@ class EntryPanel(QMainWindow):
 
         # Tab3
         self.extra_details_textEdit = QTextEdit()
+        self.extra_details_textEdit.setStyleSheet("QTextEdit {color:#C0C0C0};")
         self.extra_details_textEdit.setPlaceholderText("Enter any customer details such as last conversation, last quote, etc. here")
         # self.extra_details_textEdit.setReadOnly(True)
         self.tab3Layout.addWidget(self.extra_details_textEdit)
@@ -272,18 +279,20 @@ class EntryPanel(QMainWindow):
         self.tab1.setLayout(self.tab1Layout)
         self.tab2.setLayout(self.tab2Layout)
         self.tab3.setLayout(self.tab3Layout)
+
+        pix = str(self.ctx.available_geo().width()/136)+"px" # for 20px border-radius
         
         # Adding Save Button
         self.save_btn = QPushButton("Save")
-        self.save_btn.setFixedSize(350,65)
-        self.save_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: 20px;}")# #4ecca3
+        self.save_btn.setFixedSize(self.ctx.available_geo().width()/9.12,self.ctx.available_geo().height()/26.83)
+        self.save_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: "+pix+";}")# #4ecca3
         self.save_btn.clicked.connect(self.update_database)
         
         # Adding Undo Button
         self.undo_btn = QPushButton("Undo Changes")
-        self.undo_btn.setFixedSize(350,65)
+        self.undo_btn.setFixedSize(self.ctx.available_geo().width()/9.12,self.ctx.available_geo().height()/26.83)
         self.undo_btn.setStatusTip("Can only undo/revert changes if they are not saved!")
-        self.undo_btn.setStyleSheet("QPushButton {background-color: #acdbdf; color: black; border-radius: 20px;}")
+        self.undo_btn.setStyleSheet("QPushButton {background-color: #acdbdf; color: black; border-radius: "+pix+";}")
         self.undo_btn.setVisible(False)
 
         btn_widgets = QWidget()
@@ -299,14 +308,14 @@ class EntryPanel(QMainWindow):
         self.edit_checkbox.setVisible(False)
         # Add new invoice
         self.new_invoice_btn = QPushButton("New Invoice")
-        self.new_invoice_btn.setFixedSize(300,65)
-        self.new_invoice_btn.setStyleSheet("QPushButton {background-color: #927fbf; color: black; border-radius: 20px;}")
+        self.new_invoice_btn.setFixedSize(self.ctx.available_geo().width()/9.12,self.ctx.available_geo().height()/26.83)
+        self.new_invoice_btn.setStyleSheet("QPushButton {background-color: #927fbf; color: black; border-radius: "+pix+";}")
         self.new_invoice_btn.setVisible(False)
         self.new_invoice_btn.clicked.connect(self.open_invoice_dialog)
         # Add new payment
         self.new_payment_btn = QPushButton("New Payment")
-        self.new_payment_btn.setFixedSize(300,65)
-        self.new_payment_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: 20px;}")
+        self.new_payment_btn.setFixedSize(self.ctx.available_geo().width()/9.12,self.ctx.available_geo().height()/26.83)
+        self.new_payment_btn.setStyleSheet("QPushButton {background-color: #4ecca3; color: black; border-radius: "+pix+";}")
         self.new_payment_btn.setVisible(False)
         self.new_payment_btn.clicked.connect(self.open_payment_dialog)
 
@@ -325,13 +334,14 @@ class EntryPanel(QMainWindow):
         self.container = QWidget()
         self.containerLayout = QVBoxLayout()
         self.containerLayout.addWidget(edit_widget)
+        self.containerLayout.addItem(QSpacerItem(35, 35, QSizePolicy.Fixed))
         self.containerLayout.addWidget(tabs)
         self.containerLayout.addWidget(btn_widgets)
         self.container.setLayout(self.containerLayout)
 
         self.setCentralWidget(self.container)
 
-        self.setGeometry(800, 100, 1000*self.devicePixelRatio(),800*self.devicePixelRatio())
+        self.setGeometry(800, 100, self.ctx.available_geo().width()/2.7,self.ctx.available_geo().height()/1.1)
         self.setWindowTitle('Create New Customer')
     
     @pyqtSlot(QModelIndex)
@@ -341,7 +351,7 @@ class EntryPanel(QMainWindow):
             fill_widget(self._temp_tree_widget, self._invoice_iterator()[0][index.row()])
         else:
             fill_widget(self._temp_tree_widget, self._invoice_iterator()[1][index.row()])
-        self._temp_tree_widget.setMinimumSize(600*self.devicePixelRatio(),600*self.devicePixelRatio())
+        self._temp_tree_widget.setMinimumSize(self.ctx.available_geo().width()/4.56,self.ctx.available_geo().height()/3)
         self._temp_tree_widget.show()
     
     def _invoice_iterator(self):
