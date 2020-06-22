@@ -39,7 +39,7 @@ class DrawPieChart(QGraphicsWidget):
         font = QFont()
         font.setPointSize(14)
         font.bold()
-        font.setStyleHint(QFont.Courier)
+        # font.setStyleHint(QFont.Courier)
 
         slice = QPieSlice()
         slice = series.slices()
