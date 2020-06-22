@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import json
 from util import read_file, write_file, write_invoice_to_file, write_new_payment, inform_user, ask_user, fill_widget
+from send_email import send_payment_reminder
 
 class EntryWidget(QWidget):
 
@@ -196,6 +197,30 @@ class InvoiceListDialog(QDialog):
         self.layout.addWidget(self._invoice_list_view)
         self.setLayout(self.layout)
         self.setWindowTitle("Active Invoices")
+
+class SendPaymentReminder(QDialog):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        self.item_0 = EntryComboBox("Invoice Number:")
+        self.item_1 = EntryWidget("Email")
+
+        label = QLabel("Send Payment Reminder")
+        label.setAlignment(Qt.AlignRight)
+
+        self.layout = QGridLayout()
+        self.layout.addWidget(self.item_0)
+        self.layout.addWidget(self.item_1)
+        self.layout.addWidget(label)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
 
 class EntryPanel(QMainWindow):
 
@@ -441,11 +466,57 @@ class EntryPanel(QMainWindow):
                     active_invoice_list._invoice_model.appendRow(item)
                 
                 active_invoice_list.exec_()
+            else:
+                inform_user(self, "No active invoices for this company")
 
         except TypeError:
             inform_user(self, "No invoices for this company. You can create one using 'New Invoice'")
-        else: #BUG TODO - no message is popped if there are no active invoices
-            inform_user(self, "No active invoices for this company")
+    
+    def open_payment_reminder_dialog(self):
+        try:
+            complete_active_invoices = self._invoice_iterator()[1]
+            active_invoice_numb_only = []
+            
+            for i in range(len(complete_active_invoices)):
+                active_invoice_numb_only.append(complete_active_invoices[i]["Invoice No"])
+            
+            if active_invoice_numb_only:
+                payment_reminder_dialog = SendPaymentReminder(self)
+                payment_reminder_dialog.setWindowTitle("Payment Reminder for "+ str(self.panel_entry[0].ledit.text()))
+                payment_reminder_dialog.item_0.comboBox.addItems(active_invoice_numb_only)
+                payment_reminder_dialog.item_1.ledit.setText(self.panel_entry[3].ledit.text())
+                payment_reminder_dialog.resize(self.ctx.available_geo().width()/3.35,self.ctx.available_geo().height()/3.45)
+                ok = payment_reminder_dialog.exec_()
+
+                if ok:
+                    index_frm_combobox = payment_reminder_dialog.item_0.comboBox.currentIndex()
+                    to = str(payment_reminder_dialog.item_1.ledit.text())
+                    sender_company_name = read_file(self.ctx.get_settings_file)["company"]
+                    if not sender_company_name:
+                        sender_company_name = "BZMAN Customer" # TODO prompt user to input their company name
+                    invoice_no=str(payment_reminder_dialog.item_0.comboBox.currentText())
+                    po_no = complete_active_invoices[index_frm_combobox]["P/O ref"]
+                    pending_payment = complete_active_invoices[index_frm_combobox]["Outstanding"]
+                    
+                    response = send_payment_reminder(
+                        api_key=self.ctx.build_settings["sendgrid_api_key"],
+                        to=to,
+                        sender_company_name=sender_company_name,
+                        company_name=self.panel_entry[0].ledit.text(),
+                        invoice_no=invoice_no,
+                        po_no=po_no,
+                        remaining_payment=pending_payment
+                    )
+
+                    if response.status_code == 202:
+                        inform_user(self, "Payment reminder sent")
+                    else:
+                        inform_user(self, "Invalid email") # TODO check if truly invalid email
+            else:
+                inform_user(self, "There are no active invoices for this company")
+
+        except TypeError:
+            inform_user(self, "There are no invoices for this company. You can create one using 'New Invoice'")
     
     def _collect_widget_data(self):
         company_name = self.panel_entry[0].ledit.text()

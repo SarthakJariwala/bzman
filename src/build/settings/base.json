@@ -5,5 +5,6 @@
     "version": "0.3.1",
     "hidden_imports":["pkg_resources.py2_warn"],
     "sentry_dsn": "https://bdcf9c8be22a4f74a40ba6f6645129cd@o398713.ingest.sentry.io/5254799",
-    "public_settings": ["sentry_dsn"]
+    "sendgrid_api_key":"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",
+    "public_settings": ["sentry_dsn", "sendgrid_api_key"]
 }

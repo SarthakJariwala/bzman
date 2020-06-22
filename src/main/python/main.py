@@ -490,6 +490,7 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         record_payment_action = QAction("New Payment", self)
         view_active_invoices = QAction("View Active Invoices", self)
         quick_summ_action = QAction("Quick Company Summary", self)
+        payment_reminder = QAction("Send Payment Reminder", self)
         self.quick_add = QToolButton()
         self.quick_add.setIcon(QIcon(QPixmap(self.ctx.get_plus_sign)))
         self.quick_add.addAction(add_new_customer)
@@ -497,6 +498,7 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         self.quick_add.addAction(record_payment_action)
         self.quick_add.addAction(view_active_invoices)
         self.quick_add.addAction(quick_summ_action)
+        self.quick_add.addAction(payment_reminder)
         self.quick_add.setPopupMode(QToolButton.InstantPopup)
         self.quick_add.setIconSize(QSize(self.ctx.available_geo().width()/36.5,self.ctx.available_geo().width()/36.5))
         self.quick_add.setStyleSheet('QToolButton{border: 0px solid;} QToolButton::menu-indicator { image: none;}')
@@ -505,6 +507,7 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         record_payment_action.triggered.connect(self.new_payment)
         view_active_invoices.triggered.connect(self.view_active_invoices)
         quick_summ_action.triggered.connect(self.quick_summary)
+        payment_reminder.triggered.connect(self.send_email_payment_reminder)
 
         btn_container = QWidget()
         hbox1 = QHBoxLayout()
@@ -636,8 +639,8 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
         line_edit = dlg.findChild(QLineEdit) # search Qlineedit child to set QCompleter 
         completer = QCompleter(self._company_list_for_quick_actions, line_edit)
         completer.setCaseSensitivity(Qt.CaseInsensitive)       
-        line_edit.setCompleter(completer)           
-        dlg.resize(800,100)                             
+        line_edit.setCompleter(completer)         
+        dlg.resize(self.ctx.available_geo().width()/3.42,self.ctx.available_geo().height()/2.18)                             
         ok = dlg.exec_()                                
         company_name = dlg.textValue()
 
@@ -676,6 +679,12 @@ class MainWindow(QMainWindow): #TODO add file menu with different options here t
             self.pie_chart = PieWindow(paid, outstanding)
             self.pie_chart.setWindowTitle("Quick Account Summary")
             self.pie_chart.show()
+    
+    def send_email_payment_reminder(self):
+        idx = self.enter_company_name()
+        if isinstance(idx, int):
+            payment_reminder_dialog = EditViewPanel(idx, True, self.database_filename, self.ctx)
+            payment_reminder_dialog.open_payment_reminder_dialog()
 
     #def run():
     #    app = QApplication(sys.argv)
