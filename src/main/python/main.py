@@ -100,7 +100,8 @@ class WelcomeWindow(QMainWindow):
     def __init__(self, ctx, *args, **kwargs):
         super().__init__()
         self.ctx = ctx
-        self.check_trial_validity()
+        # remove trial checks
+        # self.check_trial_validity()
 
         self.setWindowTitle("Welcome to BZMAN!")
         version_no = self.ctx.build_settings['version']
@@ -228,21 +229,21 @@ class WelcomeWindow(QMainWindow):
         self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                   (resolution.height() / 2) - (self.frameSize().height() / 2))
     
-    def check_trial_validity(self):
-        self.BZMAN_settings = read_file(self.ctx.get_settings_file)
-        trial_start = self.BZMAN_settings["trial_start"]
+    # def check_trial_validity(self):
+    #     self.BZMAN_settings = read_file(self.ctx.get_settings_file)
+    #     trial_start = self.BZMAN_settings["trial_start"]
         
-        if trial_start == "":
-            trial_start = datetime.strftime(datetime.today(),"%Y-%m-%d")
-            self.BZMAN_settings["trial_start"] = trial_start
-            write_file(self.BZMAN_settings, self.ctx.get_settings_file)
+    #     if trial_start == "":
+    #         trial_start = datetime.strftime(datetime.today(),"%Y-%m-%d")
+    #         self.BZMAN_settings["trial_start"] = trial_start
+    #         write_file(self.BZMAN_settings, self.ctx.get_settings_file)
         
-        else:
-            if (datetime.today() - datetime.strptime(trial_start, "%Y-%m-%d")).days > 14:
-                inform_user(self, "Your trial period has expired.\n\nThank you for using trial version of BZMAN. You can purchase the full software online.")
-                sys.exit()
-            else:
-                pass
+    #     else:
+    #         if (datetime.today() - datetime.strptime(trial_start, "%Y-%m-%d")).days > 14:
+    #             inform_user(self, "Your trial period has expired.\n\nThank you for using trial version of BZMAN. You can purchase the full software online.")
+    #             sys.exit()
+    #         else:
+    #             pass
     
     def load_file(self):
     
