@@ -129,3 +129,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# local files
+screen_captures/
+*.ai
+logo_highdef.png
+logo_lowdef.png
